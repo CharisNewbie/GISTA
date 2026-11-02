@@ -10,7 +10,51 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-<body class="font-sans antialiased bg-slate-50 min-h-screen text-slate-800 print:bg-white">
+<body class="font-sans antialiased bg-slate-50 min-h-screen text-slate-800 print:bg-white" x-data="{ mobileNav: false }">
+    <!-- Global Livewire Loading Progress Bar -->
+    <div wire:loading.delay class="fixed top-0 inset-x-0 h-1 bg-gradient-to-r from-cyan-400 via-teal-400 to-cyan-600 z-[9999] shadow-md animate-pulse"></div>
+
+    <!-- Floating Toast Notification -->
+    @if (session()->has('success'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 4000)" 
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-2"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed top-5 right-5 z-[100] max-w-sm bg-white border border-emerald-200 rounded-2xl shadow-xl p-4 flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-slate-800">Berhasil</p>
+                <p class="text-xs text-slate-600 mt-0.5">{{ session('success') }}</p>
+            </div>
+            <button @click="show = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">&times;</button>
+        </div>
+    @endif
+
+    @if (session()->has('error'))
+        <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 5000)" 
+             x-transition:enter="transition ease-out duration-300 transform"
+             x-transition:enter-start="opacity-0 translate-y-2 sm:translate-y-0 sm:translate-x-2"
+             x-transition:enter-end="opacity-100 translate-y-0 sm:translate-x-0"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             class="fixed top-5 right-5 z-[100] max-w-sm bg-white border border-rose-200 rounded-2xl shadow-xl p-4 flex items-start space-x-3">
+            <div class="w-8 h-8 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-rose-800">Peringatan</p>
+                <p class="text-xs text-slate-600 mt-0.5">{{ session('error') }}</p>
+            </div>
+            <button @click="show = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">&times;</button>
+        </div>
+    @endif
+
     <div class="flex h-screen overflow-hidden print:h-auto print:overflow-visible">
         <!-- BCA Logistic Assistant Leftmost Sidebar Icon Bar -->
         <aside class="print:hidden w-16 bg-white border-r border-slate-200 flex flex-col items-center py-4 justify-between z-30 shrink-0">
@@ -116,7 +160,7 @@
         </aside>
 
         <!-- Secondary Navigation Sidebar for Sub-Menus -->
-        <aside class="print:hidden w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+        <aside class="print:hidden bg-white border-r border-slate-200 flex flex-col shrink-0 transition-all duration-300 md:w-64" :class="mobileNav ? 'fixed inset-y-0 left-16 z-40 w-64 shadow-2xl' : 'hidden md:flex w-64'">
             <!-- App Header -->
             <div class="p-5 border-b border-slate-100">
                 <div class="flex items-center space-x-2">
@@ -183,13 +227,20 @@
         <!-- Main Content Area -->
         <main class="flex-1 flex flex-col min-w-0 overflow-y-auto bg-slate-50 print:bg-white print:overflow-visible">
             <!-- Top Greeting Banner matching PDF Page 5 -->
-            <header class="print:hidden bg-gradient-to-r from-cyan-500 via-teal-500 to-cyan-600 text-white px-8 py-5 shadow-sm shrink-0">
+            <header class="print:hidden bg-gradient-to-r from-cyan-500 via-teal-500 to-cyan-600 text-white px-6 md:px-8 py-5 shadow-sm shrink-0">
                 <div class="flex items-center justify-between">
-                    <div>
-                        <h1 class="text-xl font-bold flex items-center space-x-2">
-                            <span>Selamat {{ now()->hour < 12 ? 'pagi' : (now()->hour < 15 ? 'siang' : (now()->hour < 18 ? 'sore' : 'malam')) }}, {{ auth()->user()?->name ?? 'User' }}!</span>
-                        </h1>
-                        <p class="text-cyan-100 text-xs mt-0.5">Selamat datang di aplikasi LOGISTIC ASSISTANT - GISTA Payment</p>
+                    <div class="flex items-center">
+                        <button @click="mobileNav = !mobileNav" class="md:hidden mr-3 p-1.5 rounded-lg bg-white/20 hover:bg-white/30 text-white transition focus:outline-none" title="Menu">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                            </svg>
+                        </button>
+                        <div>
+                            <h1 class="text-lg md:text-xl font-bold flex items-center space-x-2">
+                                <span>Selamat {{ now()->hour < 12 ? 'pagi' : (now()->hour < 15 ? 'siang' : (now()->hour < 18 ? 'sore' : 'malam')) }}, {{ auth()->user()?->name ?? 'User' }}!</span>
+                            </h1>
+                            <p class="text-cyan-100 text-xs mt-0.5">Selamat datang di aplikasi LOGISTIC ASSISTANT - GISTA Payment</p>
+                        </div>
                     </div>
                     <div class="flex items-center space-x-3">
                         <span class="text-xs bg-white/20 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/20 font-medium">

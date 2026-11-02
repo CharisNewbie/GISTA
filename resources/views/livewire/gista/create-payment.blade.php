@@ -76,8 +76,11 @@
                     <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Dokumen Referensi <span class="text-rose-500">*</span></label>
                     <div class="flex space-x-2">
                         <input wire:model="poNumber" type="text" placeholder="POST25001876" class="flex-1 px-3 py-2 text-xs border border-slate-200 rounded-xl focus:ring-2 focus:ring-cyan-500 focus:border-cyan-500">
-                        <button wire:click="checkPo" type="button" class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl transition">
-                            Check
+                        <button wire:click="checkPo" wire:loading.attr="disabled" type="button" class="disabled:opacity-50 px-4 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl transition flex items-center">
+                            <span wire:loading.remove wire:target="checkPo">Check</span>
+                            <span wire:loading wire:target="checkPo" class="flex items-center">
+                                <svg class="animate-spin h-3.5 w-3.5 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            </span>
                         </button>
                     </div>
                     <span class="inline-block mt-1 text-[11px] text-cyan-600 font-semibold">PO Non Termin</span>
@@ -707,7 +710,13 @@
 
                 <div class="flex justify-end space-x-2 pt-3 border-t border-slate-100">
                     <button wire:click="$set('showSubmitModal', false)" type="button" class="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl">Cancel</button>
-                    <button wire:click="submitPayment" type="button" class="px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm">Ok</button>
+                    <button wire:click="submitPayment" wire:loading.attr="disabled" type="button" class="disabled:opacity-50 px-5 py-2 bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center">
+                        <span wire:loading.remove wire:target="submitPayment">Ok (Submit)</span>
+                        <span wire:loading wire:target="submitPayment" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            Mengirim...
+                        </span>
+                    </button>
                 </div>
             </div>
         </div>

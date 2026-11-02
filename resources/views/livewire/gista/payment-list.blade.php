@@ -104,7 +104,7 @@
                         <th class="py-3 px-4 text-center">Status</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-100 text-slate-700">
+                <tbody wire:loading.class="opacity-60" class="divide-y divide-slate-100 text-slate-700 transition-opacity duration-200">
                     @forelse($documents as $index => $doc)
                         <tr class="hover:bg-slate-50/80 transition">
                             <td class="py-3 px-4 text-center text-slate-400">{{ $documents->firstItem() + $index }}</td>
@@ -130,21 +130,28 @@
                             </td>
                             <td class="py-3 px-4 text-center">
                                 @php
+                                    $isPaid = $doc->payment_status === 'Paid';
                                     $badgeClass = match($doc->status) {
                                         'Draft' => 'bg-slate-100 text-slate-700 border-slate-200',
-                                        'Waiting for Approval 1' => 'bg-amber-50 text-amber-700 border-amber-200',
-                                        'Waiting for Approval 2' => 'bg-amber-50 text-amber-700 border-amber-200',
+                                        'Waiting for Approval 1', 'Waiting for Approval 2', 'Waiting for Checker' => 'bg-amber-50 text-amber-700 border-amber-200',
                                         'Approved' => 'bg-emerald-50 text-emerald-700 border-emerald-200',
                                         'Correction' => 'bg-rose-50 text-rose-700 border-rose-200',
                                         'Pending' => 'bg-yellow-50 text-yellow-700 border-yellow-200',
                                         default => 'bg-cyan-50 text-cyan-700 border-cyan-200'
                                     };
-                                    if ($doc->payment_status === 'Paid') {
+                                    if ($isPaid) {
                                         $badgeClass = 'bg-emerald-600 text-white border-transparent';
                                     }
                                 @endphp
-                                <span class="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-semibold border {{ $badgeClass }}">
-                                    {{ $doc->payment_status === 'Paid' ? 'Paid' : $doc->status }}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border {{ $badgeClass }}">
+                                    @if($isPaid)
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                                    @elseif(str_contains($doc->status, 'Waiting'))
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse mr-1.5"></span>
+                                    @elseif($doc->status === 'Approved')
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                    @endif
+                                    {{ $isPaid ? 'Paid' : $doc->status }}
                                 </span>
                             </td>
                         </tr>

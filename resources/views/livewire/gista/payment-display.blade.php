@@ -61,8 +61,12 @@
             @endif
 
             @if($document->status === 'Approved' && $document->payment_status !== 'Paid')
-                <button wire:click="markAsPaid" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition">
-                    Proses Transfer Dana (Set Paid)
+                <button wire:click="markAsPaid" wire:loading.attr="disabled" class="disabled:opacity-50 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center">
+                    <span wire:loading.remove wire:target="markAsPaid">Proses Transfer Dana (Set Paid)</span>
+                    <span wire:loading wire:target="markAsPaid" class="flex items-center">
+                        <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                        Memproses...
+                    </span>
                 </button>
             @endif
         </div>
@@ -332,9 +336,13 @@
 
                 <div class="flex justify-end space-x-2 pt-3 border-t border-slate-100">
                     <button wire:click="$set('showActionModal', false)" class="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-semibold rounded-xl">Batal</button>
-                    <button wire:click="confirmAction" class="px-5 py-2 text-white text-xs font-bold rounded-xl shadow-sm 
+                    <button wire:click="confirmAction" wire:loading.attr="disabled" class="disabled:opacity-50 px-5 py-2 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center
                         {{ $actionType === 'reject' ? 'bg-rose-600 hover:bg-rose-700' : ($actionType === 'pending' ? 'bg-amber-600 hover:bg-amber-700' : 'bg-cyan-600 hover:bg-cyan-700') }}">
-                        Konfirmasi {{ ucfirst($actionType) }}
+                        <span wire:loading.remove wire:target="confirmAction">Konfirmasi {{ ucfirst($actionType) }}</span>
+                        <span wire:loading wire:target="confirmAction" class="flex items-center">
+                            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path></svg>
+                            Menyimpan...
+                        </span>
                     </button>
                 </div>
             </div>
