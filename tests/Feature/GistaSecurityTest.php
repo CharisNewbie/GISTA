@@ -12,6 +12,7 @@ use App\Backend\Models\DocumentAttachment;
 use App\Backend\Models\PaymentDocument;
 use App\Backend\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -199,5 +200,62 @@ class GistaSecurityTest extends TestCase
             ->get(route('attachments.download', $attachment->id))
             ->assertRedirect(route('dashboard'))
             ->assertSessionHas('error');
+    }
+
+    public function test_attachment_preview_rejects_unauthorized_user(): void
+    {
+        $doc = $this->makeDocument([
+            'created_by' => $this->otherOperator->id,
+            'spv1_id' => $this->otherSpv1->id,
+        ]);
+
+        $attachment = DocumentAttachment::create([
+            'payment_document_id' => $doc->id,
+            'doc_type' => 'Invoice Vendor',
+            'file_name' => 'invoice.pdf',
+            'file_path' => 'attachments/invoice.pdf',
+            'uploaded_by' => 'system',
+        ]);
+
+        $this->actingAs($this->operator)
+            ->get(route('attachments.preview', $attachment->id))
+            ->assertRedirect(route('dashboard'))
+            ->assertSessionHas('error');
+    }
+
+    public function test_attachment_preview_is_inline_for_authorized_user(): void
+    {
+        Storage::fake('local');
+        Storage::disk('local')->put('attachments/invoice.pdf', '%PDF-1.4 test');
+
+        $doc = $this->makeDocument([
+            'created_by' => $this->operator->id,
+            'spv1_id' => $this->spv1->id,
+        ]);
+
+        $attachment = DocumentAttachment::create([
+            'payment_document_id' => $doc->id,
+            'doc_type' => 'Invoice Vendor',
+            'file_name' => 'invoice.pdf',
+            'file_path' => 'attachments/invoice.pdf',
+            'uploaded_by' => 'system',
+        ]);
+
+        $response = $this->actingAs($this->operator)
+            ->get(route('attachments.preview', $attachment->id));
+
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'application/pdf');
+        $this->assertStringStartsWith(
+            'inline',
+            $response->headers->get('Content-Disposition')
+        );
+
+        // Preview harus boleh di-frame same-origin, jika tidak iframe akan blank.
+        $response->assertHeader('X-Frame-Options', 'SAMEORIGIN');
+        $this->assertStringContainsString(
+            "frame-ancestors 'self'",
+            $response->headers->get('Content-Security-Policy')
+        );
     }
 }

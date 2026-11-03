@@ -113,12 +113,130 @@ class CreatePayment extends Component
     public bool $showQuickEsgModal = false;
     public bool $showQuickJurnalModal = false;
 
+    public ?int $editingDocumentId = null;
+    public bool $isEditMode = false;
+
     public function mount(): void
     {
         $this->dueDate = Carbon::now()->addDay()->toDateString();
         $this->taxInvoiceDate = Carbon::now()->toDateString();
         $this->vendorInvoiceDate = Carbon::now()->toDateString();
+
+        $document = null;
+        if (request()->has('document')) {
+            $document = PaymentDocument::find(request('document'));
+        }
+        if ($document instanceof PaymentDocument) {
+            if (! $document->canBeEditedBy(auth()->user())) {
+                session()->flash('error', 'Akses Ditolak: dokumen ini tidak dapat diedit.');
+                $this->redirect(route('dashboard'), navigate: true);
+                return;
+            }
+            $this->editingDocumentId = $document->id;
+            $this->isEditMode = true;
+            $this->hydrateForEdit($document);
+            return;
+        }
+
         $this->checkPo();
+    }
+
+    private function hydrateForEdit(PaymentDocument $document): void
+    {
+        $document->load(['items', 'taxInvoices', 'additionalCosts', 'allocations', 'esgRecords', 'attachments']);
+
+        $this->poNumber = $document->po_number;
+        $this->poChecked = true;
+        $this->poFeedback = 'Data pengajuan dimuat untuk diperbaiki.';
+        $this->vendorCode = $document->vendor_code;
+        $this->vendorName = $document->vendor_name;
+        $this->docDescription = $document->description ?? $this->docDescription;
+        $this->currency = $document->currency ?: 'IDR';
+        $this->dueDate = $document->due_date?->toDateString() ?: $this->dueDate;
+        $this->hasDueDateRequest = (bool) $document->has_due_date_request;
+        $this->requestedDueDate = $document->requested_due_date?->toDateString() ?: '';
+        $this->delayReason = $document->delay_reason ?: $this->delayReason;
+        $this->delayNotes = $document->delay_notes ?: '';
+        $this->vendorInvoiceNo = $document->vendor_invoice_number ?: $this->vendorInvoiceNo;
+        $this->vendorInvoiceDate = $document->vendor_invoice_date?->toDateString() ?: $this->vendorInvoiceDate;
+        $this->dppAccount = $document->dpp_account_number ?: $this->dppAccount;
+        $this->dppAccountName = $document->dpp_account_name ?: $this->dppAccountName;
+        $this->dppBank = $document->dpp_bank_name ?: $this->dppBank;
+        $this->ppnAccount = $document->ppn_account_number ?: $this->ppnAccount;
+        $this->ppnAccountName = $document->ppn_account_name ?: $this->ppnAccountName;
+        $this->ppnBank = $document->ppn_bank_name ?: $this->ppnBank;
+        $this->paymentNotes = $document->payment_notes ?: $this->paymentNotes;
+
+        $this->dcItems = $document->items->map(fn ($item) => [
+            'line_item_po' => $item->line_item_po,
+            'item_code' => $item->item_code,
+            'item_name' => $item->item_name,
+            'dc_number' => $item->dc_number,
+            'ppn_code' => $item->ppn_code,
+            'pph_code' => $item->pph_code,
+            'nominal' => (float) $item->nominal,
+            'status_dc' => $item->status_dc,
+            'transaction_type' => $item->transaction_type,
+            'slid' => $item->slid,
+            'coa' => $item->coa,
+            'coa_name' => $item->coa_name,
+            'sub_coa' => $item->sub_coa,
+            'product_code' => $item->product_code,
+            'cost_center' => $item->cost_center,
+            'cost_center_name' => $item->cost_center_name,
+            'budget_code' => $item->budget_code,
+        ])->all();
+        $this->selectedDc = $document->items->pluck('dc_number')->all();
+
+        $this->taxInvoices = $document->taxInvoices->map(fn ($tax) => [
+            'type' => $tax->type,
+            'invoice_number' => $tax->invoice_number,
+            'invoice_date' => $tax->invoice_date?->toDateString() ?: now()->toDateString(),
+            'dpp' => (float) $tax->dpp_idr,
+            'ppn' => (float) $tax->ppn_idr,
+        ])->all();
+
+        $this->additionalCosts = $document->additionalCosts->map(fn ($cost) => [
+            'type' => $cost->type,
+            'coa' => $cost->coa,
+            'sub_coa' => $cost->sub_coa,
+            'slid' => $cost->slid,
+            'product_code' => $cost->product_code,
+            'cost_center' => $cost->cost_center,
+            'amount' => (float) $cost->amount,
+        ])->all();
+
+        $this->allocations = $document->allocations->map(fn ($alloc) => [
+            'item' => $alloc->item_description ?: '',
+            'amount' => (float) $alloc->amount,
+            'cost_center' => $alloc->cost_center,
+            'notes' => $alloc->notes,
+        ])->all();
+
+        $this->esgRecords = $document->esgRecords->map(fn ($esg) => [
+            'esg_type' => $esg->esg_type,
+            'cost_center' => $esg->cost_center,
+            'unit' => $esg->unit,
+            'usage_amount' => (float) $esg->usage_amount,
+            'unit_price' => (float) $esg->unit_price,
+            'total_amount' => (float) $esg->total_amount,
+            'billing_period' => $esg->billing_period,
+            'notes' => $esg->notes,
+        ])->all();
+
+        $this->attachments = $document->attachments->map(fn ($att) => [
+            'id' => $att->id,
+            'type' => $att->doc_type,
+            'name' => $att->file_name,
+            'path' => $att->file_path,
+            'notes' => $att->notes,
+        ])->all();
+
+        $this->selectedSpv1Id = $document->spv1_id;
+        $this->withChecker = (bool) $document->checker_id;
+        $this->selectedCheckerId = $document->checker_id;
+
+        $this->currentStep = 1;
     }
 
     public function checkPo(): void
@@ -530,18 +648,15 @@ class CreatePayment extends Component
 
         try {
             $document = DB::transaction(function () {
-                $optgNumber = PaymentDocument::generateOptgNumber();
+                $targetStatus = $this->withChecker ? 'Waiting for Checker' : 'Waiting for Approval 1';
 
-                $document = PaymentDocument::create([
-                    'optg_number' => $optgNumber,
-                    'po_type' => 'PO Standar',
+                $data = [
                     'po_number' => $this->poNumber,
                     'po_termin_type' => 'PO Non Termin',
                     'vendor_code' => $this->vendorCode,
                     'vendor_name' => $this->vendorName,
                     'description' => $this->docDescription,
                     'currency' => $this->currency,
-                    'status' => $this->withChecker ? 'Waiting for Checker' : 'Waiting for Approval 1',
                     'payment_status' => 'Payment In Process',
                     'document_completeness' => 'Pending',
                     'due_date' => $this->dueDate,
@@ -562,12 +677,38 @@ class CreatePayment extends Component
                     'total_ppn' => $this->totalTaxPpn,
                     'total_additional_cost' => $this->totalAdditionalCost,
                     'total_payment' => $this->totalPayment,
-                    'created_by' => auth()->id(),
                     'spv1_id' => $this->selectedSpv1Id,
                     'checker_id' => $this->withChecker ? $this->selectedCheckerId : null,
                     'last_modified_by' => auth()->user()->nip . ' - ' . auth()->user()->name,
                     'submitted_at' => now(),
-                ]);
+                    'sla_due_at' => now()->addDays(3),
+                ];
+
+                if ($this->isEditMode && $this->editingDocumentId) {
+                    $document = PaymentDocument::findOrFail($this->editingDocumentId)->fresh();
+                    $document->update(array_merge($data, [
+                        'status' => $document->returned_from_status ?: $targetStatus,
+                        'returned_from_status' => null,
+                        'returned_by' => null,
+                        'returned_at' => null,
+                        'pending_reason' => null,
+                        'pending_by' => null,
+                        'pending_at' => null,
+                        'pending_from_status' => null,
+                    ]));
+                    $document->items()->delete();
+                    $document->taxInvoices()->delete();
+                    $document->additionalCosts()->delete();
+                    $document->allocations()->delete();
+                    $document->esgRecords()->delete();
+                } else {
+                    $data['optg_number'] = PaymentDocument::generateOptgNumber();
+                    $data['po_type'] = 'PO Standar';
+                    $data['po_termin_type'] = 'PO Non Termin';
+                    $data['status'] = $targetStatus;
+                    $data['created_by'] = auth()->id();
+                    $document = PaymentDocument::create($data);
+                }
 
                 // Save Items
                 foreach ($this->dcItems as $item) {
@@ -649,8 +790,11 @@ class CreatePayment extends Component
                     ]);
                 }
 
-                // Save Attachments
+                // Save Attachments (skip yang sudah tersimpan di DB saat edit mode)
                 foreach ($this->attachments as $att) {
+                    if (! empty($att['id'])) {
+                        continue;
+                    }
                     DocumentAttachment::create([
                         'payment_document_id' => $document->id,
                         'doc_type' => $att['type'],
@@ -662,17 +806,30 @@ class CreatePayment extends Component
                 }
 
                 // Log Workflow (PDF Page 39)
-                $document->logWorkflow('Submitted', $this->submitNotes ?: 'Pengajuan tagihan pembayaran');
-                if ($this->withChecker) {
-                    $document->logWorkflow('Waiting for Checker', 'Menunggu verifikasi checker');
+                if ($this->isEditMode) {
+                    $document->logWorkflow('Resubmitted', $this->submitNotes ?: 'Pengajuan tagihan pembayaran diperbaiki dan diajukan ulang');
                 } else {
+                    $document->logWorkflow('Submitted', $this->submitNotes ?: 'Pengajuan tagihan pembayaran');
+                    if ($this->withChecker) {
+                        $document->logWorkflow('Waiting for Checker', 'Menunggu verifikasi checker');
+                    } else {
+                        $document->logWorkflow('Waiting for Approval 1', 'Menunggu verifikasi Supervisor Unit Kerja');
+                    }
+                }
+                if ($targetStatus === 'Waiting for Checker' && $this->isEditMode) {
+                    $document->logWorkflow('Waiting for Checker', 'Menunggu verifikasi checker');
+                } elseif ($targetStatus === 'Waiting for Approval 1' && $this->isEditMode) {
                     $document->logWorkflow('Waiting for Approval 1', 'Menunggu verifikasi Supervisor Unit Kerja');
                 }
 
                 return $document;
             });
 
-            session()->flash('success', "Dokumen {$document->optg_number} berhasil dibuat dan diajukan!");
+            if ($this->isEditMode) {
+                session()->flash('success', "Dokumen {$document->optg_number} berhasil diperbaiki dan diajukan ulang!");
+            } else {
+                session()->flash('success', "Dokumen {$document->optg_number} berhasil dibuat dan diajukan!");
+            }
             return $this->redirect(route('payment.show', $document->id), navigate: true);
         } catch (\Exception $e) {
             $this->submitError = 'Gagal menyimpan dokumen. Silakan coba lagi.';

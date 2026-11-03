@@ -2,7 +2,7 @@
     <nav class="flex items-center justify-between text-xs">
         <div class="flex-1 flex justify-between sm:hidden">
             @if ($paginator->onFirstPage())
-                <span class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg cursor-not-allowed font-medium">
+                <span class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg cursor-not-allowed font-medium">
                     ← Sebelumnya
                 </span>
             @else
@@ -16,7 +16,7 @@
                     Selanjutnya →
                 </a>
             @else
-                <span class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg cursor-not-allowed font-medium">
+                <span class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg cursor-not-allowed font-medium">
                     Selanjutnya →
                 </span>
             @endif
@@ -41,7 +41,7 @@
 
             <div class="flex items-center gap-1">
                 @if ($paginator->onFirstPage())
-                    <span class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg cursor-not-allowed font-medium">
+                    <span class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg cursor-not-allowed font-medium">
                         ← Sebelumnya
                     </span>
                 @else
@@ -52,7 +52,7 @@
 
                 @foreach ($elements as $element)
                     @if (is_string($element))
-                        <span class="px-3 py-1.5 text-slate-400">{{ $element }}</span>
+                        <span class="px-3 py-1.5 text-slate-500">{{ $element }}</span>
                     @endif
 
                     @if (is_array($element))
@@ -73,7 +73,7 @@
                         Selanjutnya →
                     </a>
                 @else
-                    <span class="px-3 py-1.5 bg-slate-100 text-slate-400 rounded-lg cursor-not-allowed font-medium">
+                    <span class="px-3 py-1.5 bg-slate-100 text-slate-500 rounded-lg cursor-not-allowed font-medium">
                         Selanjutnya →
                     </span>
                 @endif

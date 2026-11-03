@@ -12,11 +12,16 @@ class SecurityHeaders
     {
         $response = $next($request);
 
-        // Content Security Policy: only allow same-origin + fonts.bunny.net + Tailwind/Vite assets
-        $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.bunny.net; img-src 'self' data: https:; font-src 'self' https://fonts.bunny.net; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';");
+        // Attachment preview dibuka di iframe same-origin, jadi harus diizinkan
+        // untuk di-frame oleh aplikasi sendiri. Route lain tetap diblokir.
+        $isAttachmentPreview = $request->routeIs('attachments.preview');
+        $frameAncestors = $isAttachmentPreview ? "'self'" : "'none'";
 
-        // Prevent clickjacking
-        $response->headers->set('X-Frame-Options', 'DENY');
+        // Content Security Policy: only allow same-origin + fonts.bunny.net + Tailwind/Vite assets
+        $response->headers->set('Content-Security-Policy', "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.bunny.net; img-src 'self' data: https:; font-src 'self' https://fonts.bunny.net; connect-src 'self'; frame-src 'self'; object-src 'none'; frame-ancestors {$frameAncestors}; base-uri 'self'; form-action 'self';");
+
+        // Prevent clickjacking (preview lampiran boleh di-frame same-origin)
+        $response->headers->set('X-Frame-Options', $isAttachmentPreview ? 'SAMEORIGIN' : 'DENY');
 
         // Prevent MIME-type sniffing
         $response->headers->set('X-Content-Type-Options', 'nosniff');

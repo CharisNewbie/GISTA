@@ -41,6 +41,13 @@ class PaymentDocument extends Model
         'ppn_account_name',
         'ppn_bank_name',
         'payment_notes',
+        'pending_reason',
+        'pending_by',
+        'pending_at',
+        'pending_from_status',
+        'returned_from_status',
+        'returned_by',
+        'returned_at',
         'total_dpp',
         'total_ppn',
         'total_pph',
@@ -56,6 +63,9 @@ class PaymentDocument extends Model
         'submitted_at',
         'approved_at',
         'paid_at',
+        'sla_due_at',
+        'escalated_at',
+        'escalated_to',
     ];
 
     protected function casts(): array
@@ -68,6 +78,10 @@ class PaymentDocument extends Model
             'submitted_at' => 'datetime',
             'approved_at' => 'datetime',
             'paid_at' => 'datetime',
+            'sla_due_at' => 'datetime',
+            'escalated_at' => 'datetime',
+            'pending_at' => 'datetime',
+            'returned_at' => 'datetime',
             'total_dpp' => 'decimal:2',
             'total_ppn' => 'decimal:2',
             'total_pph' => 'decimal:2',
@@ -130,10 +144,22 @@ class PaymentDocument extends Model
             return false;
         }
 
+        $checker = $this->checker;
+        $spv1 = $this->spv1;
+
+        $checkerAllowed = $user->isChecker()
+            && ($this->checker_id === $user->id
+                || ($checker && $checker->isDelegateActive() && $checker->delegate_to_user_id === $user->id));
+
+        $spv1Allowed = $user->isSpv1()
+            && ($this->spv1_id === $user->id
+                || ($spv1 && $spv1->isDelegateActive() && $spv1->delegate_to_user_id === $user->id));
+
         return match ($this->status) {
-            'Waiting for Checker' => $user->isChecker() && $this->checker_id === $user->id,
-            'Waiting for Approval 1' => $user->isSpv1() && $this->spv1_id === $user->id,
+            'Waiting for Checker' => $checkerAllowed,
+            'Waiting for Approval 1' => $spv1Allowed,
             'Waiting for Approval 2' => $user->isSpv2(),
+            'Pending' => $user->isSpv2(),
             default => false,
         };
     }
@@ -156,6 +182,36 @@ class PaymentDocument extends Model
     public function spv2(): BelongsTo
     {
         return $this->belongsTo(User::class, 'spv2_id');
+    }
+
+    public function pendingBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pending_by');
+    }
+
+    public function returnedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'returned_by');
+    }
+
+    public function escalatedTo(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'escalated_to');
+    }
+
+    public function isOverdue(): bool
+    {
+        return $this->sla_due_at !== null
+            && $this->sla_due_at->isPast()
+            && ! in_array($this->status, ['Approved', 'Paid', 'Cancelled', 'Deleted'], true);
+    }
+
+    public function canBeEditedBy(?User $user): bool
+    {
+        return $user !== null
+            && $this->status === 'Correction'
+            && $user->isOperator()
+            && $this->created_by === $user->id;
     }
 
     public function items(): HasMany

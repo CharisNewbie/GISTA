@@ -2,9 +2,7 @@
     <!-- Back Button & Title (PDF Page 7) -->
     <div class="flex items-center space-x-3 mb-6">
         <a href="{{ route('payment.index') }}" class="inline-flex items-center p-2 rounded-xl bg-white border border-slate-200 hover:border-slate-300 text-slate-600 hover:bg-gista-50 active:scale-[0.98] transition-all duration-150">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+            <x-icon name="arrow-left" class="w-4 h-4" />
         </a>
         <div>
             <h2 class="text-xl font-bold text-slate-800">Jenis Pembayaran</h2>
@@ -17,12 +15,10 @@
         <!-- Option 1: PO Register -->
         <div class="bg-white rounded-2xl border border-gista-200 p-8 flex flex-col items-center text-center opacity-60 hover:opacity-100 transition cursor-not-allowed">
             <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-500 mb-6 shadow-sm">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
+                <x-icon name="clipboard" class="w-8 h-8" />
             </div>
             <h3 class="font-bold text-slate-700 text-sm mb-1">Pembayaran PO Register</h3>
-            <p class="text-[11px] text-slate-400">Pembayaran pengadaan barang terdaftar</p>
+            <p class="text-[11px] text-slate-500">Pembayaran pengadaan barang terdaftar</p>
         </div>
 
         <!-- Option 2: PO Standar (Active / Recommended) -->
@@ -31,9 +27,7 @@
                 Rekomendasi
             </span>
             <div class="w-16 h-16 rounded-2xl bg-gista-50 border border-gista-100 flex items-center justify-center text-gista-700 mb-6 shadow-sm group-hover:bg-gista-600 group-hover:text-white transition-colors duration-150">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
+                <x-icon name="document-text" class="w-8 h-8" />
             </div>
             <h3 class="font-bold text-slate-800 text-base mb-1">Pembayaran PO Standar</h3>
             <p class="text-[11px] text-slate-500 mb-5 leading-relaxed">Pengajuan tagihan pengadaan barang & jasa berbasis PO Standard (POST)</p>
@@ -45,12 +39,10 @@
         <!-- Option 3: PO Sewa -->
         <div class="bg-white rounded-2xl border border-gista-200 p-8 flex flex-col items-center text-center opacity-60 hover:opacity-100 transition cursor-not-allowed">
             <div class="w-16 h-16 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-center text-slate-500 mb-6 shadow-sm">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+                <x-icon name="building" class="w-8 h-8" />
             </div>
             <h3 class="font-bold text-slate-700 text-sm mb-1">Pembayaran PO Sewa</h3>
-            <p class="text-[11px] text-slate-400">Pembayaran termin sewa gedung & alat</p>
+            <p class="text-[11px] text-slate-500">Pembayaran termin sewa gedung & alat</p>
         </div>
     </div>
 </div>

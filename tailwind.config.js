@@ -12,7 +12,7 @@ export default {
     theme: {
         extend: {
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                sans: ['IBM Plex Sans', ...defaultTheme.fontFamily.sans],
             },
             colors: {
                 // BCA brand palette — BCA Blue #0060AF dengan turunan biru muda

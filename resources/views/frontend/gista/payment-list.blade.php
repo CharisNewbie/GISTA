@@ -20,7 +20,7 @@
         <!-- Search Input Bar & Advanced Search Toggle -->
         <div class="flex items-center space-x-3">
             <div class="relative flex-1">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -79,6 +79,7 @@
                     'Waiting for Approval 2' => 'Waiting for Approval 2',
                     'Approved' => 'Approved',
                     'Correction' => 'Correction',
+                    'Pending' => 'Pending',
                     'Paid' => 'Paid'
                 ];
             @endphp
@@ -109,7 +110,7 @@
                 <tbody wire:loading.class="opacity-60" class="divide-y divide-gista-100 text-slate-700 transition-opacity duration-200">
                     @forelse($documents as $index => $doc)
                         <tr class="hover:bg-gista-50/70 transition {{ $loop->even ? 'bg-gista-50/50' : '' }}">
-                            <td class="py-3 px-4 text-center text-slate-400">{{ $documents->firstItem() + $index }}</td>
+                            <td class="py-3 px-4 text-center text-slate-500">{{ $documents->firstItem() + $index }}</td>
                             <td class="py-3 px-4 font-mono font-semibold">
                                 <a href="{{ route('payment.show', $doc->id) }}" class="text-gista-600 hover:text-gista-800 hover:underline">
                                     {{ $doc->optg_number }}
@@ -147,21 +148,30 @@
                                 @endphp
                                 <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-semibold border {{ $badgeClass }}">
                                     @if($isPaid)
-                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" /></svg>
+                                        <x-icon name="check-circle" class="w-3 h-3 mr-1" />
+                                    @elseif($doc->status === 'Correction')
+                                        <x-icon name="alert" class="w-3 h-3 mr-1" />
+                                    @elseif($doc->status === 'Pending')
+                                        <x-icon name="clock" class="w-3 h-3 mr-1" />
                                     @elseif(str_contains($doc->status, 'Waiting'))
                                         <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse mr-1.5"></span>
                                     @elseif($doc->status === 'Approved')
-                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                        <x-icon name="check-circle" class="w-3 h-3 mr-1" />
                                     @endif
                                     {{ $isPaid ? 'Paid' : $doc->status }}
                                 </span>
+                                @if($doc->isOverdue())
+                                    <span class="inline-flex items-center ml-1 px-1.5 py-0.5 rounded-full text-[9px] font-bold bg-rose-100 text-rose-700 border border-rose-200" title="Melewati SLA">
+                                        Overdue
+                                    </span>
+                                @endif
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="8" class="py-12 text-center text-slate-400">
+                            <td colspan="8" class="py-12 text-center text-slate-500">
                                 <svg class="w-10 h-10 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                 </svg>
                                 Tidak ada data pembayaran tagihan ditemukan.
                             </td>

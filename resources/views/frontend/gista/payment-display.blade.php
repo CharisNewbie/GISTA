@@ -18,7 +18,7 @@
                 <p class="text-xs font-bold text-rose-800">Akses Ditolak</p>
                 <p class="text-xs text-slate-600 mt-0.5" x-text="$wire.authError"></p>
             </div>
-            <button @click="show = false" class="text-slate-400 hover:text-slate-600 text-sm font-bold">&times;</button>
+            <button @click="show = false" class="text-slate-500 hover:text-slate-600 text-sm font-bold">&times;</button>
         </div>
     @endif
 
@@ -59,6 +59,19 @@
             </button>
         </div>
 
+        @if($document->status === 'Correction' && $document->canBeEditedBy(auth()->user()))
+            <div class="mb-3 p-3 bg-rose-50 border border-rose-200 text-rose-800 text-xs rounded-xl flex items-center justify-between gap-3">
+                <div>
+                    <p class="font-bold mb-0.5">Dokumen dikembalikan untuk perbaikan</p>
+                    <p>Perbaiki data sesuai catatan reviewer, lalu ajukan ulang.</p>
+                </div>
+                <a href="{{ route('payment.edit', ['document' => $document->id]) }}"
+                   class="shrink-0 inline-flex items-center px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                    Perbaiki & Ajukan Ulang
+                </a>
+            </div>
+        @endif
+
         <!-- Role Action Buttons (Approve / Reject / Pending / Bukti Bayar) -->
         <div class="flex items-center space-x-2">
             @if($document->payment_status === 'Paid')
@@ -91,6 +104,17 @@
                 </button>
             @endif
 
+            @if($document->status === 'Pending' && auth()->user()?->isSpv2())
+                <button wire:click="openAction('reject')" class="inline-flex items-center px-4 py-2 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow active:scale-[0.98] transition-all duration-150">
+                    Reject
+                </button>
+                <button wire:click="openAction('approve')" class="inline-flex items-center px-5 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-rose-800 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow active:scale-[0.98] transition-all duration-150">
+                    Approve
+                </button>
+            @endif
+
+
+
             @if($document->status === 'Approved' && $document->payment_status !== 'Paid' && auth()->user()?->isSpv2())
                 <button wire:click="markAsPaid" wire:loading.attr="disabled" class="disabled:opacity-50 inline-flex items-center px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-sm hover:shadow active:scale-[0.98] transition-all duration-150">
                     <span wire:loading.remove wire:target="markAsPaid">Proses Transfer Dana (Set Paid)</span>
@@ -117,13 +141,13 @@
             <div class="flex items-start justify-between border-b border-gista-100 pb-4">
                 <div>
                     <h2 class="text-lg font-extrabold text-slate-900 font-mono">
-                        {{ $document->optg_number }} <span class="text-slate-400">&ndash;</span> <span class="font-sans font-bold text-base text-slate-700">{{ $document->description }}</span>
+                        {{ $document->optg_number }} <span class="text-slate-500">&ndash;</span> <span class="font-sans font-bold text-base text-slate-700">{{ $document->description }}</span>
                     </h2>
-                    <p class="text-[11px] text-slate-400 mt-1">Dokumen Pembayaran Eksternal</p>
+                    <p class="text-[11px] text-slate-500 mt-1">Dokumen Pembayaran Eksternal</p>
                 </div>
-                <span class="w-11 h-11 rounded-xl bg-gista-500 text-white flex items-center justify-center shadow-sm shadow-gista-500/30 shrink-0">
+                <span class="w-11 h-11 rounded-xl bg-gista-50 text-white flex items-center justify-center shadow-sm shadow-gista-500/30 shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                 </span>
             </div>
@@ -131,11 +155,11 @@
             <div class="divide-y divide-gista-100">
                 <div class="grid grid-cols-2 gap-4 py-3.5 text-xs">
                     <div>
-                        <span class="text-slate-400 font-medium">Nomor Dokumen Referensi</span>
+                        <span class="text-slate-500 font-medium">Nomor Dokumen Referensi</span>
                         <p class="font-mono font-bold text-slate-800 text-sm mt-1">{{ $document->po_number }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-medium">Status Dokumen</span>
+                        <span class="text-slate-500 font-medium">Status Dokumen</span>
                         <div class="mt-1 flex flex-wrap items-center gap-1.5">
                             <span class="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-semibold
                                 {{ $document->status === 'Approved' ? 'bg-emerald-100 text-emerald-700' :
@@ -154,11 +178,11 @@
 
                 <div class="grid grid-cols-2 gap-4 py-3.5 text-xs">
                     <div>
-                        <span class="text-slate-400 font-medium">Tanggal Pembuatan Dokumen</span>
+                        <span class="text-slate-500 font-medium">Tanggal Pembuatan Dokumen</span>
                         <p class="font-medium text-slate-800 mt-1">{{ $document->created_at->format('d/m/Y H:i:s') }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-medium">Kelengkapan Dokumen</span>
+                        <span class="text-slate-500 font-medium">Kelengkapan Dokumen</span>
                         <p class="font-bold mt-1 {{ $document->document_completeness === 'Completed' ? 'text-emerald-600' : ($document->document_completeness === 'Incomplete' ? 'text-rose-600' : 'text-slate-600') }}">
                             {{ $document->document_completeness }}
                         </p>
@@ -167,23 +191,23 @@
 
                 <div class="grid grid-cols-2 gap-4 py-3.5 text-xs">
                     <div>
-                        <span class="text-slate-400 font-medium">Tanggal Jatuh Tempo</span>
+                        <span class="text-slate-500 font-medium">Tanggal Jatuh Tempo</span>
                         <p class="font-mono font-bold text-slate-800 mt-1">{{ $document->due_date?->format('d/m/Y') }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-medium">Request Tanggal Perlambatan</span>
+                        <span class="text-slate-500 font-medium">Request Tanggal Perlambatan</span>
                         <p class="font-mono text-slate-800 mt-1">{{ $document->requested_due_date ? $document->requested_due_date->format('d/m/Y') : '-' }}</p>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 py-3.5 text-xs">
                     <div>
-                        <span class="text-slate-400 font-medium">Diajukan Oleh</span>
+                        <span class="text-slate-500 font-medium">Diajukan Oleh</span>
                         <p class="font-semibold text-slate-800 mt-1">{{ $document->creator?->name }} ({{ $document->creator?->nip }})</p>
                         <p class="text-[11px] text-slate-500">{{ $document->creator?->unit_kerja }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-medium">Diubah Terakhir Oleh</span>
+                        <span class="text-slate-500 font-medium">Diubah Terakhir Oleh</span>
                         <p class="font-medium text-slate-800 mt-1">{{ $document->last_modified_by ?? '-' }}</p>
                     </div>
                 </div>
@@ -191,33 +215,83 @@
         </div>
 
         <!-- Right: Attachment Display (1 col) (PDF Page 32) -->
-        <div class="bg-gista-50 rounded-2xl border border-gista-200 p-6 space-y-4">
-            <div class="flex items-center justify-between border-b border-gista-200/70 pb-3">
+        <div x-data="{ previewOpen: false, previewSrc: '', previewName: '', previewIsImage: false }" class="bg-gista-50 rounded-2xl border border-gista-200 p-6 space-y-4">
+            <div class="flex items-center justify-between border-b border-gista-200 pb-3">
                 <h3 class="text-sm font-bold text-slate-800">Attachment</h3>
                 <span class="text-[10px] font-bold uppercase tracking-wider text-gista-700 bg-white border border-gista-200 px-2 py-0.5 rounded-full">{{ $document->attachments->count() }} File</span>
             </div>
 
             <div class="space-y-3">
                 @forelse($document->attachments as $att)
-                    <div class="p-3 bg-white rounded-xl border border-gista-200/70 flex items-start justify-between text-xs hover:border-gista-300 transition">
+                    @php
+                        $ext = strtoupper(pathinfo($att->file_name, PATHINFO_EXTENSION)) ?: 'FILE';
+                        $isImage = in_array(strtolower($ext), ['png', 'jpg', 'jpeg', 'gif', 'webp', 'bmp'], true);
+                    @endphp
+                    <div class="p-3 bg-white rounded-xl border border-gista-200 flex items-start justify-between text-xs hover:border-gista-300 transition">
                         <div class="flex items-start space-x-2.5 min-w-0">
-                            <span class="p-1.5 rounded-lg bg-rose-50 text-rose-600 font-bold text-[9px] border border-rose-100 shrink-0">PDF</span>
+                            <span class="p-1.5 rounded-lg bg-rose-50 text-rose-600 font-bold text-[9px] border border-rose-100 shrink-0">{{ \Illuminate\Support\Str::limit($ext, 4, '') }}</span>
                             <div class="min-w-0">
-                                <a href="{{ route('attachments.download', $att->id) }}" class="font-bold text-gista-700 hover:underline block truncate max-w-[160px]">{{ $att->file_name }}</a>
-                                <p class="text-[10px] text-slate-400 mt-0.5">{{ $att->doc_type }}</p>
+                                <button type="button"
+                                        @click="previewSrc = '{{ route('attachments.preview', $att->id) }}'; previewName = @js($att->file_name); previewIsImage = @js($isImage); previewOpen = true"
+                                        class="font-bold text-gista-700 hover:underline block truncate max-w-[160px] text-left"
+                                        title="Lihat preview">
+                                    {{ $att->file_name }}
+                                </button>
+                                <p class="text-[10px] text-slate-500 mt-0.5">{{ $att->doc_type }}</p>
                                 <p class="text-[10px] text-slate-500">{{ $att->notes ?? 'Dokumen invoice' }}</p>
                             </div>
                         </div>
-                        <a href="{{ route('attachments.download', $att->id) }}" class="text-gista-600 hover:text-gista-800 shrink-0 p-1 rounded-lg hover:bg-gista-50" title="Unduh">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                        </a>
+                        <div class="flex items-center space-x-1 shrink-0">
+                            <button type="button"
+                                    @click="previewSrc = '{{ route('attachments.preview', $att->id) }}'; previewName = @js($att->file_name); previewIsImage = @js($isImage); previewOpen = true"
+                                    class="text-gista-600 hover:text-gista-800 p-1 rounded-lg hover:bg-gista-50"
+                                    title="Lihat preview">
+                                <x-icon name="eye" />
+                            </button>
+                            <a href="{{ route('attachments.download', $att->id) }}" class="text-gista-600 hover:text-gista-800 p-1 rounded-lg hover:bg-gista-50" title="Unduh">
+                                <x-icon name="download" />
+                            </a>
+                        </div>
                     </div>
                 @empty
-                    <div class="py-10 text-center text-slate-400 text-xs">
-                        <svg class="w-9 h-9 mx-auto text-gista-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <div class="py-10 text-center text-slate-500 text-xs">
+                        <svg class="w-9 h-9 mx-auto text-gista-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         Tidak ada dokumen dilampirkan.
                     </div>
                 @endforelse
+            </div>
+
+            <!-- Modal Preview Lampiran -->
+            <div x-show="previewOpen" x-transition.opacity
+                 style="display: none;"
+                 class="fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-sm p-4 flex items-center justify-center"
+                 @keydown.escape.window="previewOpen = false">
+                <div class="bg-white rounded-2xl w-full max-w-4xl h-[85vh] flex flex-col overflow-hidden shadow-2xl" @click.outside="previewOpen = false">
+                    <div class="flex items-center justify-between gap-3 px-4 py-3 border-b border-slate-100">
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-slate-800 truncate" x-text="previewName"></p>
+                            <p class="text-[10px] text-slate-500">Preview lampiran</p>
+                        </div>
+                        <div class="flex items-center space-x-2 shrink-0">
+                            <a :href="previewSrc" target="_blank" rel="noopener" class="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-slate-200 hover:border-slate-300 hover:bg-gista-50 text-slate-700 text-[11px] font-semibold rounded-xl transition">
+                                Buka Tab Baru
+                            </a>
+                            <button type="button" @click="previewOpen = false" class="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition" title="Tutup">
+                                <x-icon name="x" />
+                            </button>
+                        </div>
+                    </div>
+                    <template x-if="previewOpen">
+                        <div class="flex-1 w-full bg-slate-100 overflow-auto flex items-center justify-center">
+                            <template x-if="previewIsImage">
+                                <img :src="previewSrc" :alt="previewName" class="max-w-full max-h-full object-contain">
+                            </template>
+                            <template x-if="!previewIsImage">
+                                <iframe :src="previewSrc" class="w-full h-full bg-slate-100" title="Preview lampiran"></iframe>
+                            </template>
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -226,38 +300,38 @@
     <div class="bg-white rounded-2xl border border-gista-200 shadow-sm p-6 space-y-6">
         <h3 class="text-sm font-bold text-slate-800 border-b border-gista-100 pb-3">Detail Pembayaran Vendor</h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-slate-50/60 p-4 rounded-xl">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs bg-slate-50 p-4 rounded-xl">
             <div>
-                <span class="text-slate-400">Vendor</span>
+                <span class="text-slate-500">Vendor</span>
                 <p class="font-bold text-gista-700 mt-0.5">{{ $document->vendor_code }} - {{ $document->vendor_name }}</p>
             </div>
             <div>
-                <span class="text-slate-400">Nomor Invoice Vendor</span>
+                <span class="text-slate-500">Nomor Invoice Vendor</span>
                 <p class="font-mono font-bold text-slate-800 mt-0.5">{{ $document->vendor_invoice_number ?? '-' }}</p>
             </div>
             <div>
-                <span class="text-slate-400">Tanggal Invoice</span>
+                <span class="text-slate-500">Tanggal Invoice</span>
                 <p class="font-medium text-slate-800 mt-0.5">{{ $document->vendor_invoice_date?->format('d/m/Y') ?? '-' }}</p>
             </div>
         </div>
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs border-t border-gista-100 pt-4">
             <div>
-                <span class="text-slate-400">Total Tagihan (DPP + PPN)</span>
+                <span class="text-slate-500">Total Tagihan (DPP + PPN)</span>
                 <p class="font-mono font-bold text-slate-800 text-sm mt-0.5">IDR {{ number_format($document->total_dpp + $document->total_ppn, 2, ',', '.') }}</p>
             </div>
             <div>
-                <span class="text-slate-400">Rekening DPP Tujuan</span>
+                <span class="text-slate-500">Rekening DPP Tujuan</span>
                 <p class="font-mono font-semibold text-slate-800 mt-0.5">{{ $document->dpp_account_number }}</p>
-                <p class="text-[10px] text-slate-400">{{ $document->dpp_account_name }}</p>
+                <p class="text-[10px] text-slate-500">{{ $document->dpp_account_name }}</p>
             </div>
             <div>
-                <span class="text-slate-400">Rekening PPN Tujuan</span>
+                <span class="text-slate-500">Rekening PPN Tujuan</span>
                 <p class="font-mono font-semibold text-slate-800 mt-0.5">{{ $document->ppn_account_number }}</p>
-                <p class="text-[10px] text-slate-400">{{ $document->ppn_account_name }}</p>
+                <p class="text-[10px] text-slate-500">{{ $document->ppn_account_name }}</p>
             </div>
             <div>
-                <span class="text-slate-400 font-bold">Total Pembayaran Net</span>
+                <span class="text-slate-500 font-bold">Total Pembayaran Net</span>
                 <p class="font-mono font-extrabold text-gista-600 text-base mt-0.5">IDR {{ number_format($document->total_payment, 2, ',', '.') }}</p>
             </div>
         </div>
@@ -296,7 +370,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="py-6 text-center text-slate-400">Tidak ada detail item.</td>
+                            <td colspan="7" class="py-6 text-center text-slate-500">Tidak ada detail item.</td>
                         </tr>
                     @endforelse
                 </tbody>
@@ -315,7 +389,7 @@
                         </svg>
                         <h3 class="text-sm font-bold text-slate-800">Workflow Log &mdash; {{ $document->optg_number }}</h3>
                     </div>
-                    <button wire:click="$set('showWorkflowModal', false)" class="text-slate-400 hover:text-slate-600">&times;</button>
+                    <button wire:click="$set('showWorkflowModal', false)" class="text-slate-500 hover:text-slate-600">&times;</button>
                 </div>
 
                 <div class="border border-gista-200 rounded-xl overflow-hidden">
@@ -362,7 +436,7 @@
                     <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
                         Konfirmasi {{ $actionType }} Dokumen
                     </h3>
-                    <button wire:click="$set('showActionModal', false)" class="text-slate-400 hover:text-slate-600">&times;</button>
+                    <button wire:click="$set('showActionModal', false)" class="text-slate-500 hover:text-slate-600">&times;</button>
                 </div>
 
                 <div class="space-y-3 text-xs">
@@ -414,7 +488,7 @@
                         </svg>
                         <h3 class="text-sm font-bold text-slate-800">Detail Faktur Pajak</h3>
                     </div>
-                    <button wire:click="$set('showFakturModal', false)" class="text-slate-400 hover:text-slate-600">&times;</button>
+                    <button wire:click="$set('showFakturModal', false)" class="text-slate-500 hover:text-slate-600">&times;</button>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -439,7 +513,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-4 text-center text-slate-400 font-sans">Tidak ada data faktur pajak terlampir.</td>
+                                    <td colspan="5" class="py-4 text-center text-slate-500 font-sans">Tidak ada data faktur pajak terlampir.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -464,7 +538,7 @@
                         </svg>
                         <h3 class="text-sm font-bold text-slate-800">Detail Tagihan ESG</h3>
                     </div>
-                    <button wire:click="$set('showEsgModal', false)" class="text-slate-400 hover:text-slate-600">&times;</button>
+                    <button wire:click="$set('showEsgModal', false)" class="text-slate-500 hover:text-slate-600">&times;</button>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -489,7 +563,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-4 text-center text-slate-400 font-sans">Tidak ada data ESG untuk dokumen ini.</td>
+                                    <td colspan="5" class="py-4 text-center text-slate-500 font-sans">Tidak ada data ESG untuk dokumen ini.</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -514,7 +588,7 @@
                         </svg>
                         <h3 class="text-sm font-bold text-slate-800">Simulasi Jurnal Akuntansi (SAP)</h3>
                     </div>
-                    <button wire:click="$set('showJurnalModal', false)" class="text-slate-400 hover:text-slate-600">&times;</button>
+                    <button wire:click="$set('showJurnalModal', false)" class="text-slate-500 hover:text-slate-600">&times;</button>
                 </div>
 
                 <div class="overflow-x-auto">
@@ -532,14 +606,14 @@
                                 <td class="p-2.5 font-sans">691084 - Biaya Operasional / Pengadaan ({{ $document->po_number }})</td>
                                 <td class="p-2.5">{{ 'C00008600' }}</td>
                                 <td class="p-2.5 text-right text-emerald-600 font-bold">IDR {{ number_format($document->total_dpp, 2, ',', '.') }}</td>
-                                <td class="p-2.5 text-right text-slate-400">-</td>
+                                <td class="p-2.5 text-right text-slate-500">-</td>
                             </tr>
                             @if($document->total_ppn > 0)
                                 <tr>
                                     <td class="p-2.5 font-sans">181100 - PPN Masukan Dibayar di Muka</td>
                                     <td class="p-2.5">{{ 'C00998031' }}</td>
                                     <td class="p-2.5 text-right text-emerald-600 font-bold">IDR {{ number_format($document->total_ppn, 2, ',', '.') }}</td>
-                                    <td class="p-2.5 text-right text-slate-400">-</td>
+                                    <td class="p-2.5 text-right text-slate-500">-</td>
                                 </tr>
                             @endif
                             @if($document->total_additional_cost > 0)
@@ -547,13 +621,13 @@
                                     <td class="p-2.5 font-sans">691144 - Biaya Tambahan Pengiriman / Penanganan</td>
                                     <td class="p-2.5">{{ 'C00998031' }}</td>
                                     <td class="p-2.5 text-right text-emerald-600 font-bold">IDR {{ number_format($document->total_additional_cost, 2, ',', '.') }}</td>
-                                    <td class="p-2.5 text-right text-slate-400">-</td>
+                                    <td class="p-2.5 text-right text-slate-500">-</td>
                                 </tr>
                             @endif
-                            <tr class="bg-gista-50/50 font-bold">
+                            <tr class="bg-gista-50 font-bold">
                                 <td class="p-2.5 font-sans">212100 - Hutang Vendor ({{ $document->vendor_name }})</td>
                                 <td class="p-2.5">{{ 'C00998031' }}</td>
-                                <td class="p-2.5 text-right text-slate-400">-</td>
+                                <td class="p-2.5 text-right text-slate-500">-</td>
                                 <td class="p-2.5 text-right text-gista-700">IDR {{ number_format($document->total_payment, 2, ',', '.') }}</td>
                             </tr>
                         </tbody>

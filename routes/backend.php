@@ -28,12 +28,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/payment', PaymentList::class)->name('payment.index')->middleware('check.role:operator,checker,spv1,spv2');
     Route::get('/payment/select-type', SelectPaymentType::class)->name('payment.select-type')->middleware('check.role:operator');
     Route::get('/payment/create', CreatePayment::class)->name('payment.create')->middleware('check.role:operator');
+    Route::get('/payment/edit', CreatePayment::class)->name('payment.edit')->middleware('check.role:operator');
     Route::get('/payment/{document}', PaymentDisplay::class)->name('payment.show')->middleware('check.role:operator,checker,spv1,spv2');
     Route::get('/payment/{document}/bukti-bayar', BuktiBayar::class)->name('payment.bukti-bayar')->middleware('check.role:operator,checker,spv1,spv2');
 
     // 2. Secure attachment download (private storage, authorization-checked)
     Route::get('/attachments/{attachment}', AttachmentDownloadController::class)
         ->name('attachments.download')
+        ->middleware('check.role:operator,checker,spv1,spv2');
+
+    Route::get('/attachments/{attachment}/preview', [AttachmentDownloadController::class, 'preview'])
+        ->name('attachments.preview')
         ->middleware('check.role:operator,checker,spv1,spv2');
 
     // 3. Inbox Approval (Checker / SPV 1)

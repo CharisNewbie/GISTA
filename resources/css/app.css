@@ -2,6 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Skala UI lebih besar untuk pengguna senior (root font + target sentuh) */
+html {
+    font-size: 18px;
+}
+
+body {
+    line-height: 1.6;
+}
+
+button,
+input,
+select,
+textarea {
+    min-height: 44px;
+}
+
+button {
+    touch-action: manipulation;
+}
+
+/* Aksesibilitas global: focus ring + hormati prefers-reduced-motion */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+    outline: 2px solid #0060af;
+    outline-offset: 2px;
+    border-radius: 0.375rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
 /* Print-specific styles for Bukti Bayar */
 @media print {
     @page {

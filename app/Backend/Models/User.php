@@ -3,6 +3,7 @@
 namespace App\Backend\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -30,6 +31,9 @@ class User extends Authenticatable
         'role', // operator, checker, spv1, spv2
         'unit_kerja',
         'kode_cabang',
+        'delegate_to_user_id',
+        'delegate_start',
+        'delegate_end',
     ];
 
     protected $hidden = [
@@ -42,6 +46,8 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'delegate_start' => 'datetime',
+            'delegate_end' => 'datetime',
         ];
     }
 
@@ -68,5 +74,18 @@ class User extends Authenticatable
     public function isSpv2(): bool
     {
         return in_array($this->role, ['spv2', 'supervisor_psv', 'supervisor_txb']);
+    }
+
+    public function delegateTo(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(User::class, 'delegate_to_user_id');
+    }
+
+    public function isDelegateActive(): bool
+    {
+        return $this->delegate_to_user_id !== null
+            && $this->delegate_start !== null
+            && $this->delegate_end !== null
+            && now()->between($this->delegate_start, $this->delegate_end);
     }
 }

@@ -75,11 +75,18 @@ class PaymentDisplay extends Component
         }
 
         if ($this->actionType === 'reject') {
+            if (trim($this->actionNotes) === '') {
+                $this->addError('actionNotes', 'Alasan penolakan wajib diisi.');
+                return;
+            }
             $this->document->update([
                 'status' => 'Correction',
+                'returned_from_status' => $this->document->status === 'Pending' ? 'Waiting for Approval 2' : $this->document->status,
+                'returned_by' => $user->id,
+                'returned_at' => now(),
                 'last_modified_by' => $user->nip . ' - ' . $user->name,
             ]);
-            $this->document->logWorkflow('Correction', $this->actionNotes ?: 'Dokumen dikembalikan untuk perbaikan');
+            $this->document->logWorkflow('Correction', $this->actionNotes);
             session()->flash('success', 'Dokumen berhasil di-reject (status: Correction).');
         } elseif ($this->actionType === 'pending') {
             $this->document->update([
@@ -96,7 +103,7 @@ class PaymentDisplay extends Component
                 ]);
                 $this->document->logWorkflow('Waiting for Approval 2', $this->actionNotes ?: 'Disetujui Supervisor 1, diteruskan ke Biro Payment');
                 session()->flash('success', 'Dokumen disetujui dan diteruskan ke Approval 2 (Biro Payment).');
-            } elseif ($this->document->status === 'Waiting for Approval 2') {
+            } elseif ($this->document->status === 'Waiting for Approval 2' || $this->document->status === 'Pending') {
                 $completeness = ($this->completenessStatus === 'Incomplete') ? 'Incomplete' : 'Completed';
                 $this->document->update([
                     'status' => 'Approved',

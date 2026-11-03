@@ -2,16 +2,12 @@
     <!-- Action buttons (Hidden on print) -->
     <div class="print:hidden flex items-center justify-between">
         <a href="{{ route('payment.show', $document->id) }}" class="inline-flex items-center px-4 py-2 bg-white border border-slate-200 hover:border-slate-300 hover:bg-gista-50 text-slate-700 text-xs font-semibold rounded-xl active:scale-[0.98] transition-all duration-150 space-x-1.5">
-            <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
+            <x-icon name="arrow-left" class="w-4 h-4 text-slate-500" />
             <span>Kembali ke Dokumen</span>
         </a>
 
         <button onclick="window.print()" class="inline-flex items-center px-5 py-2 bg-gista-600 hover:bg-gista-700 active:bg-gista-800 text-white text-xs font-bold rounded-xl space-x-2 shadow-sm hover:shadow active:scale-[0.98] transition-all duration-150">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-            </svg>
+            <x-icon name="printer" class="w-4 h-4" />
             <span>Cetak Bukti Bayar</span>
         </button>
     </div>
@@ -89,7 +85,7 @@
         <div class="pt-8 border-t border-slate-200 text-center space-y-1 text-[11px] text-slate-500 italic">
             <p>This form is computer generated message and requires no signature</p>
             <p>Form ini dihasilkan dari hasil cetakan computer dan tidak memerlukan tanda tangan basah pada Form ini</p>
-            <div class="pt-4 text-[10px] text-slate-400 not-italic font-mono">
+            <div class="pt-4 text-[10px] text-slate-500 not-italic font-mono">
                 BCA Logistic Assistant &bull; PAYDUE System &bull; Dokumen Valid
             </div>
         </div>

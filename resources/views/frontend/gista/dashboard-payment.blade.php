@@ -22,7 +22,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-slate-700">Jatuh Tempo Hari Ini</p>
-                        <p class="text-[10px] text-slate-400">{{ now()->format('d F Y') }}</p>
+                        <p class="text-[10px] text-slate-500">{{ now()->format('d F Y') }}</p>
                     </div>
                     <span class="text-xs font-bold text-slate-500">Total Transaksi: <strong class="text-slate-800 text-sm font-mono">{{ $todayCount }}</strong></span>
                 </div>
@@ -47,7 +47,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-slate-700">Jatuh Tempo H+1</p>
-                        <p class="text-[10px] text-slate-400">{{ now()->addDay()->format('d F Y') }}</p>
+                        <p class="text-[10px] text-slate-500">{{ now()->addDay()->format('d F Y') }}</p>
                     </div>
                     <span class="text-xs font-bold text-slate-500">Total Transaksi: <strong class="text-slate-800 text-sm font-mono">{{ $h1Count }}</strong></span>
                 </div>
@@ -72,7 +72,7 @@
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-xs font-bold text-slate-700">Jatuh Tempo H+2</p>
-                        <p class="text-[10px] text-slate-400">{{ now()->addDays(2)->format('d F Y') }}</p>
+                        <p class="text-[10px] text-slate-500">{{ now()->addDays(2)->format('d F Y') }}</p>
                     </div>
                     <span class="text-xs font-bold text-slate-500">Total Transaksi: <strong class="text-slate-800 text-sm font-mono">{{ $h2Count }}</strong></span>
                 </div>
@@ -99,7 +99,7 @@
         <div class="p-5 border-b border-gista-100 flex items-center justify-between">
             <div>
                 <h3 class="text-sm font-bold text-slate-800">Outstanding Approval (Waiting for Approval 2)</h3>
-                <p class="text-xs text-slate-400">Daftar tagihan yang menunggu persetujuan tim Biro Payment</p>
+                <p class="text-xs text-slate-500">Daftar tagihan yang menunggu persetujuan tim Biro Payment</p>
             </div>
             <span class="text-xs font-bold px-2.5 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
                 {{ $outstanding->count() }} Dokumen Menunggu
@@ -134,7 +134,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-400">
+                            <td colspan="6" class="py-12 text-center text-slate-500">
                                 Tidak ada dokumen outstanding menunggu persetujuan Approval 2.
                             </td>
                         </tr>

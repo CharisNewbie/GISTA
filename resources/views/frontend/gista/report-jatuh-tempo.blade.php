@@ -7,9 +7,7 @@
         </div>
         <div class="flex items-center space-x-3">
             <button wire:click="exportCsv" class="inline-flex items-center px-4 py-2 bg-gista-600 hover:bg-gista-700 text-white text-xs font-semibold rounded-xl shadow-sm active:scale-[0.98] transition-all duration-150 space-x-1.5">
-                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+                <x-icon name="download" class="w-4 h-4 text-white" />
                 <span>Download CSV</span>
             </button>
         </div>
@@ -25,7 +23,7 @@
     <div class="bg-white rounded-2xl border border-gista-200 shadow-sm p-4 space-y-4">
         <div class="flex items-center space-x-3">
             <div class="relative flex-1">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
@@ -62,7 +60,7 @@
                 <tbody class="divide-y divide-gista-100 text-slate-700">
                     @forelse($documents as $idx => $doc)
                         <tr class="hover:bg-gista-50 transition {{ $loop->even ? 'bg-gista-50/50' : '' }}">
-                            <td class="py-3 px-4 text-center text-slate-400">{{ $documents->firstItem() + $idx }}</td>
+                            <td class="py-3 px-4 text-center text-slate-500">{{ $documents->firstItem() + $idx }}</td>
                             <td class="py-3 px-4 font-mono font-bold text-gista-600">
                                 <a href="{{ route('payment.show', $doc->id) }}" class="hover:underline">
                                     {{ $doc->optg_number }}
@@ -84,16 +82,23 @@
                                 {{ number_format($doc->total_payment, 2, ',', '.') }}
                             </td>
                             <td class="py-3 px-4 text-center">
-                                <button wire:click="viewStatus({{ $doc->id }})" class="px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm
+                                <button wire:click="viewStatus({{ $doc->id }})" class="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-bold transition shadow-sm
                                     {{ $doc->payment_status === 'Paid' ? 'bg-emerald-600 text-white hover:bg-emerald-700' : 
                                        ($doc->payment_status === 'Payment Failed' ? 'bg-rose-500 text-white hover:bg-rose-600' : 'bg-amber-500 text-white hover:bg-amber-600') }}">
+                                    @if($doc->payment_status === 'Paid')
+                                        <x-icon name="check-circle" class="w-3 h-3 mr-1" />
+                                    @elseif($doc->payment_status === 'Payment Failed')
+                                        <x-icon name="alert" class="w-3 h-3 mr-1" />
+                                    @else
+                                        <x-icon name="clock" class="w-3 h-3 mr-1" />
+                                    @endif
                                     {{ $doc->payment_status }}
                                 </button>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="py-12 text-center text-slate-400">
+                            <td colspan="9" class="py-12 text-center text-slate-500">
                                 Tidak ada data report jatuh tempo ditemukan.
                             </td>
                         </tr>
@@ -118,23 +123,23 @@
                         <span class="text-xs font-mono font-bold text-gista-600">Status Bayar Dokumen</span>
                         <h3 class="text-base font-bold text-slate-800 font-mono">{{ $selectedDoc->optg_number }}</h3>
                     </div>
-                    <button wire:click="$set('showStatusModal', false)" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+                    <button wire:click="$set('showStatusModal', false)" class="text-slate-500 hover:text-slate-600 text-xl font-bold">&times;</button>
                 </div>
 
                 <div class="space-y-3 text-xs">
                     <div class="p-3 bg-slate-50 rounded-xl space-y-1">
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Status Bayar Keseluruhan:</span>
+                            <span class="text-slate-500">Status Bayar Keseluruhan:</span>
                             <span class="font-bold {{ $selectedDoc->payment_status === 'Paid' ? 'text-emerald-600' : 'text-amber-600' }}">
                                 {{ $selectedDoc->payment_status }}
                             </span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Vendor:</span>
+                            <span class="text-slate-500">Vendor:</span>
                             <span class="font-bold text-slate-700">{{ $selectedDoc->vendor_name }}</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">Tanggal Bayar:</span>
+                            <span class="text-slate-500">Tanggal Bayar:</span>
                             <span class="font-mono text-slate-700">{{ $selectedDoc->paid_at ? $selectedDoc->paid_at->format('d/m/Y H:i:s') : '-' }}</span>
                         </div>
                     </div>
@@ -171,9 +176,7 @@
 
                     @if($selectedDoc->payment_status === 'Paid')
                         <a href="{{ route('payment.bukti-bayar', $selectedDoc->id) }}" target="_blank" class="px-4 py-2 bg-gista-600 hover:bg-gista-700 text-white text-xs font-bold rounded-xl flex items-center space-x-1 shadow-sm transition">
-                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                            </svg>
+                            <x-icon name="printer" class="w-4 h-4 mr-1" />
                             Bukti Bayar
                         </a>
                     @endif

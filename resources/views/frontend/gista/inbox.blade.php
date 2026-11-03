@@ -3,9 +3,7 @@
     <div class="flex items-center justify-between">
         <div>
             <h2 class="text-xl font-bold text-slate-800 flex items-center space-x-2">
-                <svg class="w-6 h-6 text-gista-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
+                <x-icon name="mail" class="w-6 h-6 text-gista-600" />
                 <span>Inbox Persetujuan Pembayaran</span>
             </h2>
             <p class="text-xs text-slate-500 mt-0.5">{{ now()->isoFormat('dddd, D MMMM Y HH:mm') }} WIB</p>
@@ -29,7 +27,14 @@
                     <div class="flex items-center space-x-1.5">
                         <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-700 text-[10px] font-bold">BARU</span>
                         <span class="px-2 py-0.5 rounded bg-purple-100 text-purple-700 text-[10px] font-bold">INTRANET</span>
-                        <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                            @if($doc->status === 'Pending')
+                                <x-icon name="clock" class="w-3 h-3 mr-1" />
+                            @elseif($doc->status === 'Correction')
+                                <x-icon name="alert" class="w-3 h-3 mr-1" />
+                            @else
+                                <x-icon name="clock" class="w-3 h-3 mr-1" />
+                            @endif
                             {{ $doc->status }}
                         </span>
                     </div>
@@ -37,32 +42,32 @@
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
                     <div>
-                        <span class="text-slate-400">Tanggal Pengajuan:</span>
+                        <span class="text-slate-500">Tanggal Pengajuan:</span>
                         <p class="font-medium text-slate-700 mt-0.5">{{ $doc->created_at->format('d/m/Y H:i:s') }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400">Diajukan Oleh:</span>
+                        <span class="text-slate-500">Diajukan Oleh:</span>
                         <p class="font-semibold text-slate-800 mt-0.5 truncate">{{ $doc->creator?->name }} ({{ $doc->creator?->nip }})</p>
                     </div>
                     <div>
-                        <span class="text-slate-400">No. Invoice Vendor:</span>
+                        <span class="text-slate-500">No. Invoice Vendor:</span>
                         <p class="font-mono text-slate-700 mt-0.5">{{ $doc->vendor_invoice_number ?? '-' }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400">Vendor:</span>
+                        <span class="text-slate-500">Vendor:</span>
                         <p class="font-bold text-slate-800 mt-0.5 truncate">{{ $doc->vendor_name }}</p>
                     </div>
 
                     <div class="md:col-span-2">
-                        <span class="text-slate-400">Keterangan Pembayaran:</span>
+                        <span class="text-slate-500">Keterangan Pembayaran:</span>
                         <p class="text-slate-700 mt-0.5">{{ $doc->description }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400 font-bold">Nilai Total Tagihan:</span>
+                        <span class="text-slate-500 font-bold">Nilai Total Tagihan:</span>
                         <p class="font-mono font-extrabold text-gista-700 text-sm mt-0.5">IDR {{ number_format($doc->total_payment, 2, ',', '.') }}</p>
                     </div>
                     <div>
-                        <span class="text-slate-400">Tanggal Perlambatan:</span>
+                        <span class="text-slate-500">Tanggal Perlambatan:</span>
                         <p class="font-mono text-slate-700 mt-0.5">{{ $doc->requested_due_date ? $doc->requested_due_date->format('d/m/Y') : '-' }}</p>
                     </div>
 
@@ -75,12 +80,10 @@
                 </div>
             </a>
         @empty
-            <div class="bg-white rounded-2xl border border-gista-200 p-12 text-center text-slate-400">
-                <svg class="w-12 h-12 mx-auto text-slate-300 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
+            <div class="bg-white rounded-2xl border border-gista-200 p-12 text-center text-slate-500">
+                <x-icon name="inbox" class="w-12 h-12 mx-auto text-slate-300 mb-2" />
                 <p class="text-sm font-semibold">Tidak ada permohonan persetujuan yang menunggu.</p>
-                <p class="text-xs text-slate-400 mt-1">Semua dokumen tagihan pembayaran telah diproses.</p>
+                <p class="text-xs text-slate-500 mt-1">Semua dokumen tagihan pembayaran telah diproses.</p>
             </div>
         @endforelse
     </div>
