@@ -1,0 +1,57 @@
+name: Deploy Build Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Build Frontend Assets
+        run: |
+          npm ci
+          npm run build
+
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: public/build/
+          retention-days: 1
+
+  deploy-backend:
+    needs: build-frontend
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Frontend Build
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-build
+          path: public/build/
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_mysql, bcmath
+
+      - name: Install Composer Dependencies (No Dev)
+        run: composer install --no-dev --optimize-autoloader --no-interaction
+
+      # ponytail: rsync/ssh transfer target depends on server provider; upgrade when host details known
+      - name: Production Ready Package
+        run: |
+          php artisan config:cache
+          php artisan route:cache
+          php artisan view:cache

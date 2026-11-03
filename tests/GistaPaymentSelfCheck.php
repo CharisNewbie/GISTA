@@ -5,9 +5,9 @@ $app = require_once __DIR__ . '/../bootstrap/app.php';
 $kernel = $app->make(Illuminate\Contracts\Console\Kernel::class);
 $kernel->bootstrap();
 
-use App\Livewire\Gista\BuktiBayar;
-use App\Models\PaymentDocument;
-use App\Models\User;
+use App\Backend\Livewire\Gista\BuktiBayar;
+use App\Backend\Models\PaymentDocument;
+use App\Backend\Models\User;
 use Illuminate\Support\Facades\Route;
 
 echo "--- GISTA PAYMENT SELF-CHECK ---\n";

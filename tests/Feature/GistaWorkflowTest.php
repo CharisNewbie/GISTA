@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Livewire\Gista\BuktiBayar;
-use App\Livewire\Gista\CreatePayment;
-use App\Livewire\Gista\PaymentDisplay;
-use App\Livewire\Gista\PaymentList;
-use App\Livewire\Gista\ReportJatuhTempo;
-use App\Models\PaymentDocument;
-use App\Models\User;
+use App\Backend\Livewire\Gista\BuktiBayar;
+use App\Backend\Livewire\Gista\CreatePayment;
+use App\Backend\Livewire\Gista\PaymentDisplay;
+use App\Backend\Livewire\Gista\PaymentList;
+use App\Backend\Livewire\Gista\ReportJatuhTempo;
+use App\Backend\Models\PaymentDocument;
+use App\Backend\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -83,6 +83,7 @@ class GistaWorkflowTest extends TestCase
             'total_ppn' => 605000,
             'total_payment' => 6105000,
             'created_by' => $this->operator->id,
+            'spv1_id' => $this->spv1->id,
         ]);
 
         $this->actingAs($this->spv1);
@@ -147,6 +148,7 @@ class GistaWorkflowTest extends TestCase
             'total_dpp' => 5500000,
             'total_payment' => 5500000,
             'created_by' => $this->operator->id,
+            'spv1_id' => $this->spv1->id,
         ]);
 
         $this->actingAs($this->spv1);

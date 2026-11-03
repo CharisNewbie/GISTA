@@ -1,1 +1,1 @@
-@include('layouts.gista', ['slot' => $slot])
+@include('frontend.layouts.gista', ['slot' => $slot])

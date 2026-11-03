@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Models\Conversation;
-use App\Models\User;
+use App\Backend\Models\Conversation;
+use App\Backend\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 

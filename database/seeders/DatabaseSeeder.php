@@ -2,15 +2,15 @@
 
 namespace Database\Seeders;
 
-use App\Models\AdditionalCost;
-use App\Models\CostAllocation;
-use App\Models\DocumentAttachment;
-use App\Models\EsgRecord;
-use App\Models\PaymentDocument;
-use App\Models\PaymentItem;
-use App\Models\TaxInvoice;
-use App\Models\User;
-use App\Models\WorkflowLog;
+use App\Backend\Models\AdditionalCost;
+use App\Backend\Models\CostAllocation;
+use App\Backend\Models\DocumentAttachment;
+use App\Backend\Models\EsgRecord;
+use App\Backend\Models\PaymentDocument;
+use App\Backend\Models\PaymentItem;
+use App\Backend\Models\TaxInvoice;
+use App\Backend\Models\User;
+use App\Backend\Models\WorkflowLog;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 

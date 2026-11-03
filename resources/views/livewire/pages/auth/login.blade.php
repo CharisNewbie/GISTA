@@ -38,19 +38,19 @@ new #[Layout('layouts.guest')] class extends Component
     <p class="text-xs text-gray-500 mb-4">GISTA Payment &mdash; Pembayaran Eksternal V.1.0</p>
 
     <!-- Quick Demo Logins -->
-    <div class="mb-5 p-3 bg-cyan-50 border border-cyan-200 rounded-xl space-y-2">
-        <p class="text-[10px] font-bold text-cyan-800 uppercase tracking-wider">Quick Login Demo (Password: password)</p>
+    <div class="mb-5 p-3 bg-gista-50 border border-gista-200 rounded-xl space-y-2">
+        <p class="text-[10px] font-bold text-gista-800 uppercase tracking-wider">Quick Login Demo (Password: password)</p>
         <div class="grid grid-cols-2 gap-1.5">
-            <button type="button" wire:click="quickLogin('operator@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-cyan-200 hover:bg-cyan-100 rounded text-cyan-900 font-semibold text-left truncate">
+            <button type="button" wire:click="quickLogin('operator@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-gista-200 hover:bg-gista-100 rounded text-gista-900 font-semibold text-left truncate">
                 1. Operator (Input)
             </button>
-            <button type="button" wire:click="quickLogin('checker@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-cyan-200 hover:bg-cyan-100 rounded text-cyan-900 font-semibold text-left truncate">
+            <button type="button" wire:click="quickLogin('checker@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-gista-200 hover:bg-gista-100 rounded text-gista-900 font-semibold text-left truncate">
                 2. Checker (Review)
             </button>
-            <button type="button" wire:click="quickLogin('spv1@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-cyan-200 hover:bg-cyan-100 rounded text-cyan-900 font-semibold text-left truncate">
+            <button type="button" wire:click="quickLogin('spv1@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-gista-200 hover:bg-gista-100 rounded text-gista-900 font-semibold text-left truncate">
                 3. SPV 1 (Unit Kerja)
             </button>
-            <button type="button" wire:click="quickLogin('spv2@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-cyan-200 hover:bg-cyan-100 rounded text-cyan-900 font-semibold text-left truncate">
+            <button type="button" wire:click="quickLogin('spv2@bca.co.id')" class="px-2 py-1 text-[11px] bg-white border border-gista-200 hover:bg-gista-100 rounded text-gista-900 font-semibold text-left truncate">
                 4. SPV 2 (Biro Payment)
             </button>
         </div>

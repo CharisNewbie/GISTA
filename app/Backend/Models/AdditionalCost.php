@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Backend\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class AdditionalCost extends Model
+{
+    protected $guarded = ['id'];
+
+    protected $fillable = [
+        'payment_document_id',
+        'type',
+        'coa',
+        'sub_coa',
+        'slid',
+        'product_code',
+        'cost_center',
+        'amount',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'decimal:2',
+        ];
+    }
+
+    public function paymentDocument(): BelongsTo
+    {
+        return $this->belongsTo(PaymentDocument::class);
+    }
+}
