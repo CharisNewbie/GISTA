@@ -1,3 +1,102 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Print-specific styles for Bukti Bayar */
+@media print {
+    @page {
+        size: A4;
+        margin: 1cm;
+    }
+    
+    body {
+        background: white !important;
+        color: black !important;
+    }
+    
+    .print\:hidden {
+        display: none !important;
+    }
+    
+    /* Ensure all layout styles work in print */
+    .max-w-3xl { max-width: 48rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+    .space-y-8 > * + * { margin-top: 2rem; }
+    .space-y-4 > * + * { margin-top: 1rem; }
+    
+    .bg-white { background-color: white; }
+    .text-slate-900 { color: rgb(15 23 42); }
+    .text-slate-800 { color: rgb(30 41 59); }
+    .text-slate-700 { color: rgb(51 65 85); }
+    .text-slate-500 { color: rgb(100 116 139); }
+    .text-slate-400 { color: rgb(148 163 184); }
+    .text-emerald-700 { color: rgb(4 120 87); }
+    .text-emerald-800 { color: rgb(6 95 70); }
+    
+    .border-slate-800 { border-color: rgb(30 41 59); }
+    .border-slate-200 { border-color: rgb(226 232 240); }
+    .border-b-2 { border-bottom-width: 2px; }
+    .border-b { border-bottom-width: 1px; }
+    .border-t { border-top-width: 1px; }
+    
+    .font-bold { font-weight: 700; }
+    .font-extrabold { font-weight: 800; }
+    .font-black { font-weight: 900; }
+    .font-medium { font-weight: 500; }
+    .italic { font-style: italic; }
+    
+    .text-xs { font-size: 0.75rem; line-height: 1rem; }
+    .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+    .text-base { font-size: 1rem; line-height: 1.5rem; }
+    .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+    
+    .uppercase { text-transform: uppercase; }
+    .tracking-wide { letter-spacing: 0.025em; }
+    .tracking-widest { letter-spacing: 0.1em; }
+    .tracking-tighter { letter-spacing: -0.05em; }
+    
+    .grid { display: grid; }
+    .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .col-span-4 { grid-column: span 4 / span 4; }
+    .col-span-8 { grid-column: span 8 / span 8; }
+    .gap-2 { gap: 0.5rem; }
+    
+    .flex { display: flex; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .space-x-3 > * + * { margin-left: 0.75rem; }
+    
+    .p-8 { padding: 2rem; }
+    .py-1\.5 { padding-top: 0.375rem; padding-bottom: 0.375rem; }
+    .pb-5 { padding-bottom: 1.25rem; }
+    .pt-8 { padding-top: 2rem; }
+    .pt-4 { padding-top: 1rem; }
+    .mt-0\.5 { margin-top: 0.125rem; }
+    
+    .rounded-xl { border-radius: 0.75rem; }
+    .rounded-full { border-radius: 9999px; }
+    
+    .w-12 { width: 3rem; }
+    .h-12 { height: 3rem; }
+    
+    .bg-blue-900 { background-color: rgb(30 58 138); }
+    .bg-emerald-100 { background-color: rgb(209 250 229); }
+    .border-emerald-300 { border-color: rgb(110 231 183); }
+    
+    .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+    .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+    
+    .text-center { text-align: center; }
+    .text-right { text-align: right; }
+    
+    .inline-block { display: inline-block; }
+    
+    .font-mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    
+    /* Prevent page breaks inside important elements */
+    .grid, .space-y-4 > * {
+        page-break-inside: avoid;
+        break-inside: avoid;
+    }
+}
