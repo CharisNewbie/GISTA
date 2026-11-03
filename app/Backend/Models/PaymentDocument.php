@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class PaymentDocument extends Model
 {
@@ -206,18 +207,37 @@ class PaymentDocument extends Model
 
     public static function generateOptgNumber(): string
     {
+        // ponytail: DB lock + retry up to 3 attempts; upgrade to distributed lock (Redis) when horizontal scaling needed
         $year = date('y');
-        $lastDoc = self::where('optg_number', 'like', "OPTG{$year}%")
-            ->orderBy('id', 'desc')
-            ->first();
+        $attempts = 0;
+        $maxAttempts = 3;
 
-        if ($lastDoc) {
-            $lastSeq = (int) substr($lastDoc->optg_number, 6);
-            $seq = str_pad($lastSeq + 1, 6, '0', STR_PAD_LEFT);
-        } else {
-            $seq = '000461';
+        while ($attempts < $maxAttempts) {
+            try {
+                return DB::transaction(function () use ($year) {
+                    $lastDoc = self::where('optg_number', 'like', "OPTG{$year}%")
+                        ->lockForUpdate()
+                        ->orderBy('id', 'desc')
+                        ->first();
+
+                    if ($lastDoc) {
+                        $lastSeq = (int) substr($lastDoc->optg_number, 6);
+                        $seq = str_pad($lastSeq + 1, 6, '0', STR_PAD_LEFT);
+                    } else {
+                        $seq = '000461';
+                    }
+
+                    return "OPTG{$year}{$seq}";
+                });
+            } catch (\Exception $e) {
+                $attempts++;
+                if ($attempts >= $maxAttempts) {
+                    throw $e;
+                }
+                usleep(50000); // 50ms delay before retry
+            }
         }
 
-        return "OPTG{$year}{$seq}";
+        throw new \RuntimeException('Failed to generate OPTG number after ' . $maxAttempts . ' attempts');
     }
 }

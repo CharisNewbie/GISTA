@@ -11,6 +11,7 @@ use App\Backend\Models\PaymentItem;
 use App\Backend\Models\TaxInvoice;
 use App\Backend\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
@@ -527,147 +528,156 @@ class CreatePayment extends Component
             'selectedCheckerId.exists' => 'Checker yang dipilih tidak valid.',
         ]);
 
-        $optgNumber = PaymentDocument::generateOptgNumber();
+        try {
+            $document = DB::transaction(function () {
+                $optgNumber = PaymentDocument::generateOptgNumber();
 
-        $document = PaymentDocument::create([
-            'optg_number' => $optgNumber,
-            'po_type' => 'PO Standar',
-            'po_number' => $this->poNumber,
-            'po_termin_type' => 'PO Non Termin',
-            'vendor_code' => $this->vendorCode,
-            'vendor_name' => $this->vendorName,
-            'description' => $this->docDescription,
-            'currency' => $this->currency,
-            'status' => $this->withChecker ? 'Waiting for Checker' : 'Waiting for Approval 1',
-            'payment_status' => 'Payment In Process',
-            'document_completeness' => 'Pending',
-            'due_date' => $this->dueDate,
-            'has_due_date_request' => $this->hasDueDateRequest,
-            'requested_due_date' => $this->hasDueDateRequest ? $this->requestedDueDate : null,
-            'delay_reason' => $this->hasDueDateRequest ? $this->delayReason : null,
-            'delay_notes' => $this->hasDueDateRequest ? $this->delayNotes : null,
-            'vendor_invoice_number' => $this->vendorInvoiceNo,
-            'vendor_invoice_date' => $this->vendorInvoiceDate,
-            'dpp_account_number' => $this->dppAccount,
-            'dpp_account_name' => $this->dppAccountName,
-            'dpp_bank_name' => $this->dppBank,
-            'ppn_account_number' => $this->ppnAccount,
-            'ppn_account_name' => $this->ppnAccountName,
-            'ppn_bank_name' => $this->ppnBank,
-            'payment_notes' => $this->paymentNotes,
-            'total_dpp' => $this->totalDpp,
-            'total_ppn' => $this->totalTaxPpn,
-            'total_additional_cost' => $this->totalAdditionalCost,
-            'total_payment' => $this->totalPayment,
-            'created_by' => auth()->id(),
-            'spv1_id' => $this->selectedSpv1Id,
-            'checker_id' => $this->withChecker ? $this->selectedCheckerId : null,
-            'last_modified_by' => auth()->user()->nip . ' - ' . auth()->user()->name,
-            'submitted_at' => now(),
-        ]);
-
-        // Save Items
-        foreach ($this->dcItems as $item) {
-            if (in_array($item['dc_number'], $this->selectedDc)) {
-                PaymentItem::create([
-                    'payment_document_id' => $document->id,
-                    'line_item_po' => $item['line_item_po'],
-                    'item_code' => $item['item_code'],
-                    'item_name' => $item['item_name'],
-                    'dc_number' => $item['dc_number'],
-                    'ppn_code' => $item['ppn_code'],
-                    'pph_code' => $item['pph_code'],
-                    'nominal' => $item['nominal'],
-                    'status_dc' => $item['status_dc'],
-                    'transaction_type' => $item['transaction_type'],
-                    'slid' => $item['slid'],
-                    'coa' => $item['coa'],
-                    'coa_name' => $item['coa_name'],
-                    'sub_coa' => $item['sub_coa'],
-                    'product_code' => $item['product_code'],
-                    'cost_center' => $item['cost_center'],
-                    'cost_center_name' => $item['cost_center_name'],
-                    'budget_code' => $item['budget_code'],
-                    'is_selected' => true,
+                $document = PaymentDocument::create([
+                    'optg_number' => $optgNumber,
+                    'po_type' => 'PO Standar',
+                    'po_number' => $this->poNumber,
+                    'po_termin_type' => 'PO Non Termin',
+                    'vendor_code' => $this->vendorCode,
+                    'vendor_name' => $this->vendorName,
+                    'description' => $this->docDescription,
+                    'currency' => $this->currency,
+                    'status' => $this->withChecker ? 'Waiting for Checker' : 'Waiting for Approval 1',
+                    'payment_status' => 'Payment In Process',
+                    'document_completeness' => 'Pending',
+                    'due_date' => $this->dueDate,
+                    'has_due_date_request' => $this->hasDueDateRequest,
+                    'requested_due_date' => $this->hasDueDateRequest ? $this->requestedDueDate : null,
+                    'delay_reason' => $this->hasDueDateRequest ? $this->delayReason : null,
+                    'delay_notes' => $this->hasDueDateRequest ? $this->delayNotes : null,
+                    'vendor_invoice_number' => $this->vendorInvoiceNo,
+                    'vendor_invoice_date' => $this->vendorInvoiceDate,
+                    'dpp_account_number' => $this->dppAccount,
+                    'dpp_account_name' => $this->dppAccountName,
+                    'dpp_bank_name' => $this->dppBank,
+                    'ppn_account_number' => $this->ppnAccount,
+                    'ppn_account_name' => $this->ppnAccountName,
+                    'ppn_bank_name' => $this->ppnBank,
+                    'payment_notes' => $this->paymentNotes,
+                    'total_dpp' => $this->totalDpp,
+                    'total_ppn' => $this->totalTaxPpn,
+                    'total_additional_cost' => $this->totalAdditionalCost,
+                    'total_payment' => $this->totalPayment,
+                    'created_by' => auth()->id(),
+                    'spv1_id' => $this->selectedSpv1Id,
+                    'checker_id' => $this->withChecker ? $this->selectedCheckerId : null,
+                    'last_modified_by' => auth()->user()->nip . ' - ' . auth()->user()->name,
+                    'submitted_at' => now(),
                 ]);
-            }
-        }
 
-        // Save Tax Invoices
-        foreach ($this->taxInvoices as $tax) {
-            TaxInvoice::create([
-                'payment_document_id' => $document->id,
-                'type' => $tax['type'],
-                'invoice_number' => $tax['invoice_number'],
-                'invoice_date' => $tax['invoice_date'],
-                'currency' => 'IDR',
-                'dpp_idr' => $tax['dpp'],
-                'ppn_idr' => $tax['ppn'],
-            ]);
-        }
+                // Save Items
+                foreach ($this->dcItems as $item) {
+                    if (in_array($item['dc_number'], $this->selectedDc)) {
+                        PaymentItem::create([
+                            'payment_document_id' => $document->id,
+                            'line_item_po' => $item['line_item_po'],
+                            'item_code' => $item['item_code'],
+                            'item_name' => $item['item_name'],
+                            'dc_number' => $item['dc_number'],
+                            'ppn_code' => $item['ppn_code'],
+                            'pph_code' => $item['pph_code'],
+                            'nominal' => $item['nominal'],
+                            'status_dc' => $item['status_dc'],
+                            'transaction_type' => $item['transaction_type'],
+                            'slid' => $item['slid'],
+                            'coa' => $item['coa'],
+                            'coa_name' => $item['coa_name'],
+                            'sub_coa' => $item['sub_coa'],
+                            'product_code' => $item['product_code'],
+                            'cost_center' => $item['cost_center'],
+                            'cost_center_name' => $item['cost_center_name'],
+                            'budget_code' => $item['budget_code'],
+                            'is_selected' => true,
+                        ]);
+                    }
+                }
 
-        // Save Additional Costs
-        foreach ($this->additionalCosts as $cost) {
-            AdditionalCost::create([
-                'payment_document_id' => $document->id,
-                'type' => $cost['type'],
-                'coa' => $cost['coa'],
-                'sub_coa' => $cost['sub_coa'],
-                'slid' => $cost['slid'],
-                'product_code' => $cost['product_code'],
-                'cost_center' => $cost['cost_center'],
-                'amount' => $cost['amount'],
-            ]);
-        }
+                // Save Tax Invoices
+                foreach ($this->taxInvoices as $tax) {
+                    TaxInvoice::create([
+                        'payment_document_id' => $document->id,
+                        'type' => $tax['type'],
+                        'invoice_number' => $tax['invoice_number'],
+                        'invoice_date' => $tax['invoice_date'],
+                        'currency' => 'IDR',
+                        'dpp_idr' => $tax['dpp'],
+                        'ppn_idr' => $tax['ppn'],
+                    ]);
+                }
 
-        // Save Allocations
-        foreach ($this->allocations as $alloc) {
-            CostAllocation::create([
-                'payment_document_id' => $document->id,
-                'item_description' => $alloc['item'] ?? null,
-                'amount' => $alloc['amount'],
-                'cost_center' => $alloc['cost_center'],
-                'notes' => $alloc['notes'] ?? null,
-            ]);
-        }
+                // Save Additional Costs
+                foreach ($this->additionalCosts as $cost) {
+                    AdditionalCost::create([
+                        'payment_document_id' => $document->id,
+                        'type' => $cost['type'],
+                        'coa' => $cost['coa'],
+                        'sub_coa' => $cost['sub_coa'],
+                        'slid' => $cost['slid'],
+                        'product_code' => $cost['product_code'],
+                        'cost_center' => $cost['cost_center'],
+                        'amount' => $cost['amount'],
+                    ]);
+                }
 
-        // Save ESG Records
-        foreach ($this->esgRecords as $esg) {
-            EsgRecord::create([
-                'payment_document_id' => $document->id,
-                'esg_type' => $esg['esg_type'],
-                'cost_center' => $esg['cost_center'],
-                'unit' => $esg['unit'],
-                'usage_amount' => $esg['usage_amount'],
-                'unit_price' => $esg['unit_price'],
-                'total_amount' => $esg['total_amount'],
-                'billing_period' => $esg['billing_period'],
-                'notes' => $esg['notes'] ?? null,
-            ]);
-        }
+                // Save Allocations
+                foreach ($this->allocations as $alloc) {
+                    CostAllocation::create([
+                        'payment_document_id' => $document->id,
+                        'item_description' => $alloc['item'] ?? null,
+                        'amount' => $alloc['amount'],
+                        'cost_center' => $alloc['cost_center'],
+                        'notes' => $alloc['notes'] ?? null,
+                    ]);
+                }
 
-        // Save Attachments
-        foreach ($this->attachments as $att) {
-            DocumentAttachment::create([
-                'payment_document_id' => $document->id,
-                'doc_type' => $att['type'],
-                'file_name' => $att['name'],
-                'file_path' => $att['path'],
-                'notes' => $att['notes'],
-                'uploaded_by' => auth()->user()->nip . ' - ' . auth()->user()->name,
-            ]);
-        }
+                // Save ESG Records
+                foreach ($this->esgRecords as $esg) {
+                    EsgRecord::create([
+                        'payment_document_id' => $document->id,
+                        'esg_type' => $esg['esg_type'],
+                        'cost_center' => $esg['cost_center'],
+                        'unit' => $esg['unit'],
+                        'usage_amount' => $esg['usage_amount'],
+                        'unit_price' => $esg['unit_price'],
+                        'total_amount' => $esg['total_amount'],
+                        'billing_period' => $esg['billing_period'],
+                        'notes' => $esg['notes'] ?? null,
+                    ]);
+                }
 
-        // Log Workflow (PDF Page 39)
-        $document->logWorkflow('Submitted', $this->submitNotes ?: 'Pengajuan tagihan pembayaran');
-        if ($this->withChecker) {
-            $document->logWorkflow('Waiting for Checker', 'Menunggu verifikasi checker');
-        } else {
-            $document->logWorkflow('Waiting for Approval 1', 'Menunggu verifikasi Supervisor Unit Kerja');
-        }
+                // Save Attachments
+                foreach ($this->attachments as $att) {
+                    DocumentAttachment::create([
+                        'payment_document_id' => $document->id,
+                        'doc_type' => $att['type'],
+                        'file_name' => $att['name'],
+                        'file_path' => $att['path'],
+                        'notes' => $att['notes'],
+                        'uploaded_by' => auth()->user()->nip . ' - ' . auth()->user()->name,
+                    ]);
+                }
 
-        session()->flash('success', "Dokumen {$optgNumber} berhasil dibuat dan diajukan!");
-        return $this->redirect(route('payment.show', $document->id), navigate: true);
+                // Log Workflow (PDF Page 39)
+                $document->logWorkflow('Submitted', $this->submitNotes ?: 'Pengajuan tagihan pembayaran');
+                if ($this->withChecker) {
+                    $document->logWorkflow('Waiting for Checker', 'Menunggu verifikasi checker');
+                } else {
+                    $document->logWorkflow('Waiting for Approval 1', 'Menunggu verifikasi Supervisor Unit Kerja');
+                }
+
+                return $document;
+            });
+
+            session()->flash('success', "Dokumen {$document->optg_number} berhasil dibuat dan diajukan!");
+            return $this->redirect(route('payment.show', $document->id), navigate: true);
+        } catch (\Exception $e) {
+            $this->submitError = 'Gagal menyimpan dokumen. Silakan coba lagi.';
+            report($e);
+        }
     }
 
     public function render()
