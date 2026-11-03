@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Gista') }}</title>
+        <title>{{ config('app.name', 'PAYDUE') }}</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -19,7 +19,7 @@
             <!-- Logo -->
             <div class="mb-8">
                 <a href="/" wire:navigate>
-                    <h1 class="text-4xl font-bold text-white tracking-tight">Gista</h1>
+                    <h1 class="text-4xl font-bold text-white tracking-tight">PAYDUE</h1>
                 </a>
             </div>
 

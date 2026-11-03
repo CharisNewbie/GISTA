@@ -1,4 +1,4 @@
-# Panduan Frontend Developer (GISTA App)
+# Panduan Frontend Developer (PAYDUE App)
 
 Area kerja frontend berada di folder **`resources/`** dan konfigurasi asset. Temanmu tidak perlu menyentuh file logic PHP/backend (`app/Backend`, `database/`, dsb).
 

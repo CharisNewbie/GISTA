@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="theme-color" content="#0060af">
-    <title>{{ config('app.name', 'GISTA Payment') }} - BCA Logistic Assistant</title>
+    <title>{{ config('app.name', 'PAYDUE') }} - BCA Logistic Assistant</title>
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600,700&display=swap" rel="stylesheet" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -93,7 +93,7 @@
             <!-- App Header -->
             <div class="p-5 border-b border-gista-100">
                 <div class="flex items-center space-x-2">
-                    <span class="text-gista-600 font-extrabold text-xl tracking-tight">GISTA</span>
+                    <span class="text-gista-600 font-extrabold text-xl tracking-tight">PAYDUE</span>
                     <span class="text-xs font-semibold px-2 py-0.5 rounded bg-gista-100 text-gista-800">Payment</span>
                 </div>
                 <p class="text-xs text-slate-400 mt-1">Pembayaran Eksternal V.1.0</p>
@@ -230,7 +230,7 @@
                             <h1 class="text-lg md:text-xl font-bold text-slate-900 flex items-center space-x-2">
                                 <span>Selamat {{ now()->hour < 12 ? 'pagi' : (now()->hour < 15 ? 'siang' : (now()->hour < 18 ? 'sore' : 'malam')) }}, {{ auth()->user()?->name ?? 'User' }}!</span>
                             </h1>
-                            <p class="text-slate-500 text-xs mt-0.5">GISTA Payment &bull; Pembayaran Eksternal</p>
+                            <p class="text-slate-500 text-xs mt-0.5">PAYDUE &bull; Pembayaran Eksternal</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-3">

@@ -35,7 +35,7 @@ new #[Layout('layouts.guest')] class extends Component
     <x-auth-session-status class="mb-4" :status="session('status')" />
 
     <h2 class="text-2xl font-bold text-gray-900 mb-1">BCA Logistic Assistant</h2>
-    <p class="text-xs text-gray-500 mb-4">GISTA Payment &mdash; Pembayaran Eksternal V.1.0</p>
+    <p class="text-xs text-gray-500 mb-4">PAYDUE &mdash; Pembayaran Eksternal V.1.0</p>
 
     <!-- Quick Demo Logins -->
     <div class="mb-5 p-3 bg-gista-50 border border-gista-200 rounded-xl space-y-2">

@@ -90,7 +90,7 @@
             <p>This form is computer generated message and requires no signature</p>
             <p>Form ini dihasilkan dari hasil cetakan computer dan tidak memerlukan tanda tangan basah pada Form ini</p>
             <div class="pt-4 text-[10px] text-slate-400 not-italic font-mono">
-                BCA Logistic Assistant &bull; GISTA Payment System &bull; Dokumen Valid
+                BCA Logistic Assistant &bull; PAYDUE System &bull; Dokumen Valid
             </div>
         </div>
     </div>
