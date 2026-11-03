@@ -123,7 +123,7 @@ class PaymentDisplay extends Component
             return;
         }
 
-        // Popup instead of 403 page
+        // Biro Payment (SPV 2) boleh menandai pembayaran semua dokumen yang Approved
         if (!auth()->user()->isSpv2()) {
             $this->authError = 'Hanya SPV 2 yang dapat menandai pembayaran sebagai Paid.';
             return;

@@ -16,11 +16,13 @@ class DashboardPayment extends Component
         $h1 = Carbon::today()->addDay();
         $h2 = Carbon::today()->addDays(2);
 
-        $todayCount = PaymentDocument::whereDate('due_date', $today)->count();
-        $h1Count = PaymentDocument::whereDate('due_date', $h1)->count();
-        $h2Count = PaymentDocument::whereDate('due_date', $h2)->count();
+        $query = PaymentDocument::query()->visibleTo(auth()->user());
 
-        $outstanding = PaymentDocument::where('status', 'Waiting for Approval 2')
+        $todayCount = (clone $query)->whereDate('due_date', $today)->count();
+        $h1Count = (clone $query)->whereDate('due_date', $h1)->count();
+        $h2Count = (clone $query)->whereDate('due_date', $h2)->count();
+
+        $outstanding = (clone $query)->where('status', 'Waiting for Approval 2')
             ->latest()
             ->get();
 

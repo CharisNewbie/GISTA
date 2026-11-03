@@ -64,7 +64,9 @@ class ReportJatuhTempo extends Component
 
     public function render()
     {
-        $query = PaymentDocument::query()->latest('due_date');
+        $query = PaymentDocument::query()
+            ->visibleTo(auth()->user())
+            ->latest('due_date');
 
         if ($this->statusFilter !== 'All') {
             $query->where('status', $this->statusFilter);
