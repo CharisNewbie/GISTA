@@ -18,12 +18,13 @@ class ReportJatuhTempo extends Component
     public bool $showStatusModal = false;
     public string $authError = '';
 
-    public function viewStatus(int $id): void
+    public function viewStatus($id): void
     {
         // Scoping otorisasi: jangan biarkan ID dokumen orang lain diintip.
+        $docId = (int) $id;
         $doc = PaymentDocument::query()
             ->visibleTo(auth()->user())
-            ->find($id);
+            ->find($docId);
 
         if (! $doc) {
             $this->authError = 'Akses Ditolak: dokumen tidak ditemukan atau bukan hak akses Anda.';

@@ -431,11 +431,11 @@
                         <tbody class="divide-y divide-gista-100 font-mono">
                             @forelse($document->taxInvoices as $tax)
                                 <tr>
-                                    <td class="p-2.5 font-sans font-medium text-slate-700">{{ $tax->invoice_type ?? 'Standar' }}</td>
+                                    <td class="p-2.5 font-sans font-medium text-slate-700">{{ $tax->type ?? 'Standar' }}</td>
                                     <td class="p-2.5 text-gista-700 font-bold">{{ $tax->invoice_number }}</td>
                                     <td class="p-2.5 text-slate-500">{{ $tax->invoice_date ? \Carbon\Carbon::parse($tax->invoice_date)->format('d/m/Y') : '-' }}</td>
-                                    <td class="p-2.5 text-right">IDR {{ number_format($tax->dpp_amount, 2, ',', '.') }}</td>
-                                    <td class="p-2.5 text-right font-bold text-emerald-600">IDR {{ number_format($tax->ppn_amount, 2, ',', '.') }}</td>
+                                    <td class="p-2.5 text-right">IDR {{ number_format($tax->dpp_idr, 2, ',', '.') }}</td>
+                                    <td class="p-2.5 text-right font-bold text-emerald-600">IDR {{ number_format($tax->ppn_idr, 2, ',', '.') }}</td>
                                 </tr>
                             @empty
                                 <tr>
@@ -530,14 +530,14 @@
                         <tbody class="divide-y divide-gista-100 font-mono">
                             <tr>
                                 <td class="p-2.5 font-sans">691084 - Biaya Operasional / Pengadaan ({{ $document->po_number }})</td>
-                                <td class="p-2.5">{{ $document->cost_center ?? 'C00008600' }}</td>
+                                <td class="p-2.5">{{ 'C00008600' }}</td>
                                 <td class="p-2.5 text-right text-emerald-600 font-bold">IDR {{ number_format($document->total_dpp, 2, ',', '.') }}</td>
                                 <td class="p-2.5 text-right text-slate-400">-</td>
                             </tr>
                             @if($document->total_ppn > 0)
                                 <tr>
                                     <td class="p-2.5 font-sans">181100 - PPN Masukan Dibayar di Muka</td>
-                                    <td class="p-2.5">{{ $document->cost_center ?? 'C00998031' }}</td>
+                                    <td class="p-2.5">{{ 'C00998031' }}</td>
                                     <td class="p-2.5 text-right text-emerald-600 font-bold">IDR {{ number_format($document->total_ppn, 2, ',', '.') }}</td>
                                     <td class="p-2.5 text-right text-slate-400">-</td>
                                 </tr>
@@ -545,14 +545,14 @@
                             @if($document->total_additional_cost > 0)
                                 <tr>
                                     <td class="p-2.5 font-sans">691144 - Biaya Tambahan Pengiriman / Penanganan</td>
-                                    <td class="p-2.5">{{ $document->cost_center ?? 'C00998031' }}</td>
+                                    <td class="p-2.5">{{ 'C00998031' }}</td>
                                     <td class="p-2.5 text-right text-emerald-600 font-bold">IDR {{ number_format($document->total_additional_cost, 2, ',', '.') }}</td>
                                     <td class="p-2.5 text-right text-slate-400">-</td>
                                 </tr>
                             @endif
                             <tr class="bg-gista-50/50 font-bold">
                                 <td class="p-2.5 font-sans">212100 - Hutang Vendor ({{ $document->vendor_name }})</td>
-                                <td class="p-2.5">{{ $document->cost_center ?? 'C00998031' }}</td>
+                                <td class="p-2.5">{{ 'C00998031' }}</td>
                                 <td class="p-2.5 text-right text-slate-400">-</td>
                                 <td class="p-2.5 text-right text-gista-700">IDR {{ number_format($document->total_payment, 2, ',', '.') }}</td>
                             </tr>
